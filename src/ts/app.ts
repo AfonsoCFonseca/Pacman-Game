@@ -13,7 +13,8 @@ class GameScene extends Phaser.Scene {
     }
 
     preload(){
-        this.load.image('pacman', 'assets/pacman.png');
+        //this.load.image('pacman', 'assets/pacman.png');
+        this.load.spritesheet('pacman', 'assets/pacmanSpriteSheet.png', { frameWidth: 50, frameHeight: 50 });
     }
 
     create(){
@@ -24,9 +25,34 @@ class GameScene extends Phaser.Scene {
         map = new Map( this )
         pacman = new Pacman( player )
        
+        this.anims.create({
+            frames: this.anims.generateFrameNumbers('pacman', { start: 0, end: 3 }),
+            key: 'pacmanEastAnim',
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            frames: this.anims.generateFrameNumbers('pacman', { start: 10, end: 12 }),
+            key: 'pacmanWestAnim',
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            frames: this.anims.generateFrameNumbers('pacman', { start: 4, end: 6 }),
+            key: 'pacmanNorthAnim',
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            frames: this.anims.generateFrameNumbers('pacman', { start: 7, end: 9 }),
+            key: 'pacmanSouthAnim',
+            frameRate: 10,
+            repeat: -1
+        });
     }
 
     update(){
+        
 
         keys()
         boundaries()
@@ -51,18 +77,22 @@ function boundaries(){
 function keys(){
 
     if (cursors.left.isDown ){
+        player.anims.play('pacmanWestAnim', true);
         player.setVelocityY(0);
         player.setVelocityX(-160);
     }
     else if (cursors.right.isDown ){
+        player.anims.play('pacmanEastAnim', true);
         player.setVelocityY(0);
         player.setVelocityX(160);
     }
     else if (cursors.up.isDown){
+        player.anims.play('pacmanNorthAnim', true);
         player.setVelocityX(0);
         player.setVelocityY(-160);
     }
     else if (cursors.down.isDown){
+        player.anims.play('pacmanSouthAnim', true);
         player.setVelocityX(0);
         player.setVelocityY(160);
     }
