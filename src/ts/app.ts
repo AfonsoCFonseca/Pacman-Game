@@ -1,11 +1,15 @@
 import "phaser"
 import { Pacman } from './Pacman'
 import { Map } from './Map'
+import { directionEnum } from './game-interfaces/direction.interface'
 
-export let map
+export let map: Map
 let cursors;
 let player;
-let pacman;
+let pacman: Pacman;
+
+let nextTileGUI
+let currentTileGUI
 
 class GameScene extends Phaser.Scene {
     constructor(){
@@ -13,12 +17,11 @@ class GameScene extends Phaser.Scene {
     }
 
     preload(){
-        //this.load.image('pacman', 'assets/pacman.png');
         this.load.spritesheet('pacman', 'assets/pacmanSpriteSheet.png', { frameWidth: 50, frameHeight: 50 });
     }
 
     create(){
-        player = this.physics.add.sprite(100, 350, 'pacman');
+        player = this.physics.add.sprite(200, 350, 'pacman');
 
         cursors = this.input.keyboard.createCursorKeys();
 
@@ -26,7 +29,7 @@ class GameScene extends Phaser.Scene {
         pacman = new Pacman( player )
        
         this.anims.create({
-            frames: this.anims.generateFrameNumbers('pacman', { start: 0, end: 3 }),
+            frames: this.anims.generateFrameNumbers('pacman', { start: 1, end: 3 }),
             key: 'pacmanEastAnim',
             frameRate: 10,
             repeat: -1
@@ -49,53 +52,60 @@ class GameScene extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+
+        let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
+        let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
+
+        nextTileGUI = this.add.text( 900, 80, "Next Tile: "+ nextTile, { fontSize: '20px', fill: '#FFFFFF' });
+        currentTileGUI = this.add.text( 900, 120, "Current Tile: "+ currentTile, { fontSize: '20px', fill: '#FFFFFF' });
     }
 
     update(){
         
 
-        keys()
-        boundaries()
+        this.keys()
 
-        pacman.setCurrentPosition({ 
-            x: parseInt( player.x ), 
-            y: parseInt( player.y ) 
-        })
-        pacman.getCurrentTile()
+        pacman.update()
+        this.boundaries()
+
+        this.develop()
+
     }
 
-}
+    develop(){
 
-function boundaries(){
-    let x = parseInt( player.x )
-    let y = parseInt( player.y )
+        let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
+        let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
 
-    if( x < 0 || x > 500 )
-        player.setVelocityX(0);
-}
+        nextTileGUI.setText( "Next Tile: "+nextTile )
+        currentTileGUI.setText( "Current Tile: "+currentTile )
+    
+    }
 
-function keys(){
+    boundaries(){
 
-    if (cursors.left.isDown ){
-        player.anims.play('pacmanWestAnim', true);
-        player.setVelocityY(0);
-        player.setVelocityX(-160);
+        if( pacman.getNextTile().type == "WALL" ){
+            if( pacman.direction() == "EAST" || pacman.direction() == "WEST" )
+                pacman.findAlternativeWay("long")
+            if( pacman.direction() == "NORTH" || pacman.direction() == "SOUTH" )
+                pacman.findAlternativeWay("lat")
+        }
+    
     }
-    else if (cursors.right.isDown ){
-        player.anims.play('pacmanEastAnim', true);
-        player.setVelocityY(0);
-        player.setVelocityX(160);
+    
+    keys(){
+    
+        if (cursors.left.isDown )
+            pacman.move(directionEnum.WEST)
+        else if (cursors.right.isDown )
+            pacman.move(directionEnum.EAST)
+        else if (cursors.up.isDown)
+            pacman.move(directionEnum.NORTH)
+        else if (cursors.down.isDown)
+            pacman.move(directionEnum.SOUTH)
+    
     }
-    else if (cursors.up.isDown){
-        player.anims.play('pacmanNorthAnim', true);
-        player.setVelocityX(0);
-        player.setVelocityY(-160);
-    }
-    else if (cursors.down.isDown){
-        player.anims.play('pacmanSouthAnim', true);
-        player.setVelocityX(0);
-        player.setVelocityY(160);
-    }
+    
 
 }
 

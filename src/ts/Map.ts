@@ -1,13 +1,10 @@
 import {Tile} from './Tile'
-
-interface Position {
-    x: number,
-    y: number
-}
+import { Position } from './game-interfaces/position.interface'
 
 export class Map {
     private MAP_WIDTH = 19;
     private MAP_HEIGHT = 19;
+    private TILE_SIZE = 50
     private currentMap: Tile[][] = [[]]
 
     constructor( scene ){
@@ -25,10 +22,9 @@ export class Map {
         }
     }
 
-    public getCurrentTile({ x, y }: Position): Tile{
-        let currentX =  Math.round( x / 25 ) 
-        let currentY =  Math.round( y / 25 ) 
-
+    public getTile({ x, y }: Position, type: "index"|"position" = "position"): Tile{
+        let currentX = type == "position" ? Math.round( x / this.TILE_SIZE ) : x 
+        let currentY = type == "position" ? Math.round( y / this.TILE_SIZE ) : y
         return this.currentMap[currentX][currentY]
     }
 

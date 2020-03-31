@@ -1,4 +1,6 @@
-enum allStates {
+import { Position } from './game-interfaces/position.interface' 
+
+enum tileType {
     EMPTY = "EMPTY",
     POINT = "POINT",
     WALL = "WALL"
@@ -6,26 +8,31 @@ enum allStates {
 
 export class Tile {
 
-    private TILE_SIZE = 50
-    private posX: number
-    private posY: number
-    private currentState = allStates.EMPTY
+    protected TILE_SIZE = 50
+    public type = tileType.EMPTY
+    private position: Position;
+    public _id: string;
 
-    constructor( x, y, value  ){
-
-        this.setPosition( x, y )
+    constructor( x, y, value ){
+        this._id = `tile_${x}_${y}`
+        this.setPosition({ x, y })
         this.setTileValue( value )
     }
 
-    public setPosition( x, y ){
-        this.posX = x
-        this.posY = y
+    public setPosition( position ){
+        this.position = position
     }
 
-    public setTileValue( value ){
-        if( !value || value > 3 )
-            value = 0
-            
-        this.currentState = allStates[value]
+    public getPosition(): Position{
+        return this.position
+    }
+
+    public setTileValue( value: number ){
+        if( value == 0 )
+            this.type  = tileType.EMPTY
+        else if( value == 1 )
+            this.type  = tileType.WALL
+        else if( value == 2 )
+            this.type  = tileType.POINT
     }
 }
