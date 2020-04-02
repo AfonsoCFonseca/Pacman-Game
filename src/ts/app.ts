@@ -21,6 +21,7 @@ class GameScene extends Phaser.Scene {
     preload(){
         this.load.spritesheet('pacman', 'assets/pacmanSpriteSheet.png', { frameWidth: 50, frameHeight: 50 });
         this.load.image( 'tileImage', 'assets/secondTile.png' )
+        this.load.image( 'pointImage', 'assets/point.png' )
 
         this.imageGroup = this.add.group();
 
