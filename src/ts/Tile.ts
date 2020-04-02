@@ -12,8 +12,10 @@ export class Tile {
     public type = tileType.EMPTY
     private position: Position;
     public _id: string;
+    scene: any;
 
-    constructor( x, y, value ){
+    constructor( scene, x, y, value ){
+        this.scene = scene
         this._id = `tile_${x}_${y}`
         this.setPosition({ x, y })
         this.setTileValue( value )
@@ -30,8 +32,11 @@ export class Tile {
     public setTileValue( value: number ){
         if( value == 0 )
             this.type  = tileType.EMPTY
-        else if( value == 1 )
+        else if( value == 1 ){
             this.type  = tileType.WALL
+            let square = this.scene.add.image( this.position.x * this.TILE_SIZE, this.position.y* this.TILE_SIZE, "tileImage" ).setOrigin(0,0)
+            this.scene.imageGroup.add(square);
+        }
         else if( value == 2 )
             this.type  = tileType.POINT
     }

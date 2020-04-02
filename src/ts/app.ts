@@ -12,16 +12,22 @@ let nextTileGUI
 let currentTileGUI
 
 class GameScene extends Phaser.Scene {
+    imageGroup: Phaser.GameObjects.Group
+
     constructor(){
         super({})
     }
 
     preload(){
         this.load.spritesheet('pacman', 'assets/pacmanSpriteSheet.png', { frameWidth: 50, frameHeight: 50 });
+        this.load.image( 'tileImage', 'assets/secondTile.png' )
+
+        this.imageGroup = this.add.group();
+
     }
 
     create(){
-        player = this.physics.add.sprite(200, 350, 'pacman');
+        player = this.physics.add.sprite(325,575, 'pacman');
 
         cursors = this.input.keyboard.createCursorKeys();
 
@@ -31,12 +37,6 @@ class GameScene extends Phaser.Scene {
         this.anims.create({
             frames: this.anims.generateFrameNumbers('pacman', { start: 1, end: 3 }),
             key: 'pacmanEastAnim',
-            frameRate: 10,
-            repeat: -1
-        });
-        this.anims.create({
-            frames: this.anims.generateFrameNumbers('pacman', { start: 10, end: 12 }),
-            key: 'pacmanWestAnim',
             frameRate: 10,
             repeat: -1
         });
@@ -52,16 +52,21 @@ class GameScene extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+        this.anims.create({
+            frames: this.anims.generateFrameNumbers('pacman', { start: 10, end: 12 }),
+            key: 'pacmanWestAnim',
+            frameRate: 10,
+            repeat: -1
+        });
 
         let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
         let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
 
-        nextTileGUI = this.add.text( 900, 80, "Next Tile: "+ nextTile, { fontSize: '20px', fill: '#FFFFFF' });
-        currentTileGUI = this.add.text( 900, 120, "Current Tile: "+ currentTile, { fontSize: '20px', fill: '#FFFFFF' });
+        nextTileGUI = this.add.text( 1000, 80, "Next Tile: "+ nextTile, { fontSize: '20px', fill: '#FFFFFF' });
+        currentTileGUI = this.add.text( 1000, 120, "Current Tile: "+ currentTile, { fontSize: '20px', fill: '#FFFFFF' });
     }
 
-    update(){
-        
+    update(){  
 
         this.keys()
 
@@ -79,7 +84,7 @@ class GameScene extends Phaser.Scene {
 
         nextTileGUI.setText( "Next Tile: "+nextTile )
         currentTileGUI.setText( "Current Tile: "+currentTile )
-    
+
     }
 
     boundaries(){
@@ -95,14 +100,18 @@ class GameScene extends Phaser.Scene {
     
     keys(){
     
-        if (cursors.left.isDown )
-            pacman.move(directionEnum.WEST)
-        else if (cursors.right.isDown )
-            pacman.move(directionEnum.EAST)
-        else if (cursors.up.isDown)
-            pacman.move(directionEnum.NORTH)
-        else if (cursors.down.isDown)
-            pacman.move(directionEnum.SOUTH)
+        if (cursors.left.isDown ){
+            pacman.setRequestedDirection(directionEnum.WEST)
+        }
+        else if (cursors.right.isDown ){
+            pacman.setRequestedDirection(directionEnum.EAST)
+        }
+        else if (cursors.up.isDown){
+            pacman.setRequestedDirection(directionEnum.NORTH)
+        }
+        else if (cursors.down.isDown){
+            pacman.setRequestedDirection(directionEnum.SOUTH)
+        }
     
     }
     

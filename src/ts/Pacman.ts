@@ -7,11 +7,10 @@ export class Pacman {
 
     private position: Position
     private player;
-    private VELOCITY = 160
     private actualDirection = directionEnum.EAST
-    private newDirection: directionEnum | null = null
     private nextTile: Tile
-    private tileId: string
+    private requestedDirection: directionEnum = directionEnum.EAST
+    private SPEED = 3
 
     constructor( player ){
         this.player = player
@@ -21,7 +20,6 @@ export class Pacman {
         }
 
         this.setCurrentPosition( this.position )
-        this.tileId = this.getCurrentTile()._id
         this.setNextTile()
     }   
 
@@ -42,25 +40,12 @@ export class Pacman {
         return this.actualDirection
     }
 
+    public setRequestedDirection( reqDir : directionEnum ){
+        this.requestedDirection = reqDir
+    }
+
     public setNextTile( ) {
-        let {x,y} = this.getCurrentTile().getPosition()
-
-        switch(this.actualDirection) {
-            case "SOUTH":
-                y += 1
-            break;
-            case "NORTH":
-                y -= 1
-            break;
-            case "WEST":
-                x -= 1
-            break;
-            case "EAST":
-                x += 1
-            break;
-        }
-
-        this.nextTile = map.getTile( {x,y}, "index")
+        this.nextTile = map.getNeighborTile( this.getCurrentTile(), this.requestedDirection)
     }
 
     setCurrentPosition({ x, y }: Position){
@@ -68,58 +53,75 @@ export class Pacman {
     }
 
     public update(){
+
         this.setCurrentPosition( this.player )
+        this.setNextTile()
 
-        if( this.shouldUpdateTile( ) ){
-            this.tileId = this.getCurrentTile()._id
-            this.actualDirection = this.newDirection
-            this.setNextTile()
+        this.requestMovementInformation()
+        this.move()
+
+    }
+
+    private requestMovementInformation(){
+
+        let { x, y } = this.getCurrentPosition()
+
+        for( var i= 0; i < this.SPEED; i++ ){
+            if( this.actualDirection == "SOUTH" && (y+i) % 25 === 0 && (y+i) % 2 !== 0 ){
+                this.actualDirection = this.requestedDirection
+                this.player.y = y+i
+            }
+            else if( this.actualDirection == "NORTH" && (y-i) % 25 === 0 && (y-i) % 2 !== 0 ){
+                this.actualDirection = this.requestedDirection
+                this.player.y = y-i
+            }
+            else if( this.actualDirection == "WEST" && (x-i) % 25 === 0 && (x-i) % 2 !== 0 ){
+                this.actualDirection = this.requestedDirection
+                this.player.x = x-i
+            }
+            else if( this.actualDirection == "EAST" &&(x+i) % 25 === 0 && (x+i) % 2 !== 0 ){
+                this.actualDirection = this.requestedDirection
+                this.player.x = x+i
+            }
         }
+
     }
+
     
-    shouldUpdateTile( ): boolean {
-       if( this.getCurrentTile()._id != this.tileId || 
-        this.newDirection != this.actualDirection )
-            return true
-        else return false
-    }
-
-    public move( direction: directionEnum){
-        this.newDirection = direction
-
-        switch(direction) {
+    public move( ){
+        switch(this.actualDirection) {
             case "SOUTH":
                 this.player.anims.play('pacmanSouthAnim', true);
-                this.player.setVelocityX(0);
-                this.player.setVelocityY(this.VELOCITY);
+                this.player.body.y+= this.SPEED
             break;
             case "NORTH":
                 this.player.anims.play('pacmanNorthAnim', true);
-                this.player.setVelocityX(0);
-                this.player.setVelocityY(-this.VELOCITY);
+                this.player.body.y-= this.SPEED
             break;
             case "WEST":
                 this.player.anims.play('pacmanWestAnim', true);
-                this.player.setVelocityX(-this.VELOCITY);
-                this.player.setVelocityY(0);
+                this.player.body.x-= this.SPEED
     
             break;
             case "EAST":
                 this.player.anims.play('pacmanEastAnim', true);
-                this.player.setVelocityX(this.VELOCITY);
-                this.player.setVelocityY(0);
+                this.player.body.x+= this.SPEED
             break;
-
         }
     }
 
     public findAlternativeWay( nextWay: 'lat' | 'long' ){
-
+        
+        var rand = Math.floor(Math.random() * 10) + 1
         if( nextWay == "long" ){
-            this.move(directionEnum.NORTH)
+            if( rand%2 == 0 )
+                this.requestedDirection = directionEnum.NORTH
+            else this.requestedDirection = directionEnum.SOUTH
         }
         else if( nextWay == "lat"){
-            this.move(directionEnum.EAST)
+            if( rand%2 == 0 )
+                this.requestedDirection = directionEnum.EAST
+            else this.requestedDirection = directionEnum.WEST
         }
         
     }
