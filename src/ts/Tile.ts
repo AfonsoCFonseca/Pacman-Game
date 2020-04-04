@@ -34,15 +34,21 @@ export class Tile {
     public setTileValue( value: number ){
         if( value == 0 ){
             this.type  = tileType.POINT
-            let point = this.scene.add.image( 
-                (this.position.x * this.TILE_SIZE) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ), 
-                (this.position.y* this.TILE_SIZE) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 )
-                , "pointImage" ).setOrigin(0,0)
-            this.scene.imageGroup.add(point);
+            
+            let point = this.scene.pointsGroup.create( 
+                (this.position.x *this.TILE_SIZE) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ),
+                (this.position.y* this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ),
+                'pointImage').setOrigin(0,0)
+            
+            point.setData('TileObject', this);
+
         }
         else if( value == 1 ){
             this.type  = tileType.WALL
-            let square = this.scene.add.image( this.position.x * this.TILE_SIZE, this.position.y* this.TILE_SIZE, "tileImage" ).setOrigin(0,0)
+            let square = this.scene.add.image( 
+                this.position.x * this.TILE_SIZE,
+                this.position.y * this.TILE_SIZE,
+                  "tileImage" ).setOrigin(0,0)
             this.scene.imageGroup.add(square);
         }
         else if( value == 2 ){

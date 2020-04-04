@@ -3,6 +3,8 @@ import { Position } from './game-interfaces/position.interface'
 import { directionEnum } from './game-interfaces/direction.interface';
 
 export class Map {
+    private MAP_X = 0;
+    private MAP_Y = 100
     private MAP_WIDTH = 19;
     private MAP_HEIGHT = 21;
     private TILE_SIZE = 50
@@ -18,8 +20,12 @@ export class Map {
         for( let y = 0; y < this.MAP_HEIGHT; y++ ){
             this.currentMap[y] = []
             for( let x = 0; x < this.MAP_WIDTH; x++ ){
+
+                if( mapSetup1[y][x] == 0 ) this.scene.maxPoints++  
+
                 let tile = new Tile( this.scene, x, y, mapSetup1[y][x] )
                 this.currentMap[y][x] = tile
+
             }
         }
     }
@@ -85,7 +91,7 @@ let mapSetup1 = [
     [1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,1],
     [1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1],
     [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
-    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,1],
     [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
     [1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1],
     [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],

@@ -8,11 +8,19 @@ let cursors;
 let player;
 let pacman: Pacman;
 
-let nextTileGUI
-let currentTileGUI
+export const MAP_X = 0;
+export const MAP_Y = 100
+
+// let nextTileGUI
+// let currentTileGUI
+let pointGUI
 
 class GameScene extends Phaser.Scene {
     imageGroup: Phaser.GameObjects.Group
+    pointsGroup: Phaser.Physics.Arcade.StaticGroup
+    points = 0; 
+    maxPoints: number
+    logoImage
 
     constructor(){
         super({})
@@ -22,18 +30,24 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('pacman', 'assets/pacmanSpriteSheet.png', { frameWidth: 50, frameHeight: 50 });
         this.load.image( 'tileImage', 'assets/secondTile.png' )
         this.load.image( 'pointImage', 'assets/point.png' )
+        this.load.image( 'logo', 'assets/Pac-Man_title.png' )
 
         this.imageGroup = this.add.group();
+        this.pointsGroup = this.physics.add.staticGroup();
 
     }
 
     create(){
+        this.add.image( window.innerWidth/2 + 150,1110, 'logo')
         player = this.physics.add.sprite(325,575, 'pacman');
+        pointGUI = this.add.text( 80,1160, "Points: 0", { fontSize: '30px', fill: '#FFFFFF' })
 
         cursors = this.input.keyboard.createCursorKeys();
 
         map = new Map( this )
         pacman = new Pacman( player )
+
+        this.physics.add.overlap( player, this.pointsGroup, this.collectPoint, null, this )
        
         this.anims.create({
             frames: this.anims.generateFrameNumbers('pacman', { start: 1, end: 3 }),
@@ -60,11 +74,6 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
-        let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
-
-        nextTileGUI = this.add.text( 1000, 80, "Next Tile: "+ nextTile, { fontSize: '20px', fill: '#FFFFFF' });
-        currentTileGUI = this.add.text( 1000, 120, "Current Tile: "+ currentTile, { fontSize: '20px', fill: '#FFFFFF' });
     }
 
     update(){  
@@ -74,19 +83,20 @@ class GameScene extends Phaser.Scene {
         pacman.update()
         this.boundaries()
 
-        this.develop()
+        // this.develop()
+        this.drawGui()
 
     }
 
-    develop(){
+    // develop(){
 
-        let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
-        let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
+    //     let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
+    //     let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
 
-        nextTileGUI.setText( "Next Tile: "+nextTile )
-        currentTileGUI.setText( "Current Tile: "+currentTile )
+    //     nextTileGUI.setText( "Next Tile: "+nextTile )
+    //     currentTileGUI.setText( "Current Tile: "+currentTile )
 
-    }
+    // }
 
     boundaries(){
 
@@ -97,6 +107,18 @@ class GameScene extends Phaser.Scene {
                 pacman.findAlternativeWay("lat")
         }
     
+    }
+
+    collectPoint( player, point ){
+        
+        let pointOb = point.getData('TileObject')
+        pointOb.setTileValue(2)
+        this.points++
+        point.disableBody( true, true )
+
+        if( this.points >= this.maxPoints ){
+            this.nextLevel()
+        }
     }
     
     keys(){
@@ -115,7 +137,16 @@ class GameScene extends Phaser.Scene {
         }
     
     }
-    
+
+    nextLevel(){
+        console.log( "Next Level")
+    }
+
+
+    drawGui(){
+        let pointsText = `Points: ${this.points}`
+        pointGUI.setText( pointsText )
+    }
 
 }
 
