@@ -35,5 +35,7 @@ The points are removed when pacman collides with the point hitbox, a point is in
 
 # Scratches & Evolution
 
-<img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
-<img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
+<p float="left">
+  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
+  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
+</p>
