@@ -1,9 +1,11 @@
 import { Position } from './game-interfaces/position.interface' 
+import { scene } from './app'
 
-enum tileType {
+export enum tileType {
     EMPTY = "EMPTY",
     POINT = "POINT",
-    WALL = "WALL"
+    WALL = "WALL",
+    POWER_UP = "POWER_UP"
 }
 
 export class Tile {
@@ -14,10 +16,8 @@ export class Tile {
     public type = tileType.EMPTY
     private position: Position;
     public _id: string;
-    scene: any;
 
-    constructor( scene, x, y, value ){
-        this.scene = scene
+    constructor( x, y, value ){
         this._id = `tile_${x}_${y}`
         this.setPosition({ x, y })
         this.setTileValue( value )
@@ -35,7 +35,7 @@ export class Tile {
         if( value == 0 ){
             this.type  = tileType.POINT
             
-            let point = this.scene.pointsGroup.create( 
+            let point = scene.pointsGroup.create( 
                 (this.position.x *this.TILE_SIZE) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ),
                 (this.position.y* this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ),
                 'pointImage').setOrigin(0,0)
@@ -45,14 +45,24 @@ export class Tile {
         }
         else if( value == 1 ){
             this.type  = tileType.WALL
-            let square = this.scene.add.image( 
+            let square = scene.add.image( 
                 this.position.x * this.TILE_SIZE,
                 this.position.y * this.TILE_SIZE,
                   "tileImage" ).setOrigin(0,0)
-            this.scene.imageGroup.add(square);
+            scene.imageGroup.add(square);
         }
         else if( value == 2 ){
             this.type  = tileType.EMPTY
+        }
+        else if( value == 3 ){
+            this.type = tileType.POWER_UP
+
+            let powerup = scene.powerUpGroup.create( 
+                (this.position.x *this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POWER_UP_SIZE/2 ),
+                (this.position.y* this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POWER_UP_SIZE/2 ),
+                'power-up').setOrigin(0,0)
+            
+                powerup.setData('TileObject', this);
         }
     }
 }

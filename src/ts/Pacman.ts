@@ -1,16 +1,17 @@
 import { map } from './app'
-import { Tile } from './Tile'
+import { Tile, tileType } from './Tile'
 import { Position} from './game-interfaces/position.interface'
 import { directionEnum } from './game-interfaces/direction.interface'
+import { requestMovementInformation } from './Utils/utils'
 
 export class Pacman {
 
-    private position: Position
+    public position: Position
     private player;
-    private actualDirection = directionEnum.EAST
+    public actualDirection = directionEnum.EAST
     private nextTile: Tile
-    private requestedDirection: directionEnum = directionEnum.EAST
-    private SPEED = 3
+    public requestedDirection: directionEnum = directionEnum.EAST
+    public SPEED = 3
 
     constructor( player ){
         this.player = player
@@ -57,37 +58,11 @@ export class Pacman {
         this.setCurrentPosition( this.player )
         this.setNextTile()
 
-        this.requestMovementInformation()
+        this.actualDirection = requestMovementInformation( this )
         this.move()
 
     }
 
-    private requestMovementInformation(){
-
-        let { x, y } = this.getCurrentPosition()
-
-        for( var i= 0; i < this.SPEED; i++ ){
-            if( this.actualDirection == "SOUTH" && (y+i) % 25 === 0 && (y+i) % 2 !== 0 ){
-                this.actualDirection = this.requestedDirection
-                this.player.y = y+i
-            }
-            else if( this.actualDirection == "NORTH" && (y-i) % 25 === 0 && (y-i) % 2 !== 0 ){
-                this.actualDirection = this.requestedDirection
-                this.player.y = y-i
-            }
-            else if( this.actualDirection == "WEST" && (x-i) % 25 === 0 && (x-i) % 2 !== 0 ){
-                this.actualDirection = this.requestedDirection
-                this.player.x = x-i
-            }
-            else if( this.actualDirection == "EAST" &&(x+i) % 25 === 0 && (x+i) % 2 !== 0 ){
-                this.actualDirection = this.requestedDirection
-                this.player.x = x+i
-            }
-        }
-
-    }
-
-    
     public move( ){
         switch(this.actualDirection) {
             case "SOUTH":

@@ -2,11 +2,18 @@ import "phaser"
 import { Pacman } from './Pacman'
 import { Map } from './Map'
 import { directionEnum } from './game-interfaces/direction.interface'
+import { GameMode } from './game-interfaces/modes.interface'
+import { RedGhost } from './Enemy/RedGhost'
+import { Enemy } from "./Enemy/Enemy"
+import { pacmanAnimInit, ghostsAnimInit } from "./Utils/animations"
+
+export let scene
 
 export let map: Map
 let cursors;
 let player;
-let pacman: Pacman;
+export let pacman: Pacman;
+let enemy1: Enemy
 
 export const MAP_X = 0;
 export const MAP_Y = 100
@@ -15,9 +22,12 @@ export const MAP_Y = 100
 // let currentTileGUI
 let pointGUI
 
-class GameScene extends Phaser.Scene {
+export class GameScene extends Phaser.Scene {
     imageGroup: Phaser.GameObjects.Group
     pointsGroup: Phaser.Physics.Arcade.StaticGroup
+    powerUpGroup: Phaser.Physics.Arcade.StaticGroup
+    enemyGroup: Phaser.GameObjects.Group
+
     points = 0; 
     maxPoints: number
     logoImage
@@ -28,12 +38,18 @@ class GameScene extends Phaser.Scene {
 
     preload(){
         this.load.spritesheet('pacman', 'assets/pacmanSpriteSheet.png', { frameWidth: 50, frameHeight: 50 });
+        this.load.spritesheet('ghosts', 'assets/ghosts.png', { frameWidth: 50, frameHeight: 50 });
         this.load.image( 'tileImage', 'assets/secondTile.png' )
         this.load.image( 'pointImage', 'assets/point.png' )
+        this.load.image( 'power-up', 'assets/power-up.png' )
         this.load.image( 'logo', 'assets/Pac-Man_title.png' )
 
         this.imageGroup = this.add.group();
         this.pointsGroup = this.physics.add.staticGroup();
+        this.powerUpGroup = this.physics.add.staticGroup();
+        this.enemyGroup = this.add.group()
+        
+        scene = this
 
     }
 
@@ -44,35 +60,15 @@ class GameScene extends Phaser.Scene {
 
         cursors = this.input.keyboard.createCursorKeys();
 
-        map = new Map( this )
+        pacmanAnimInit()
+        ghostsAnimInit()
+
+        map = new Map( )
         pacman = new Pacman( player )
+        enemy1 = new RedGhost( { x: 75, y: 75} )
 
         this.physics.add.overlap( player, this.pointsGroup, this.collectPoint, null, this )
-       
-        this.anims.create({
-            frames: this.anims.generateFrameNumbers('pacman', { start: 1, end: 3 }),
-            key: 'pacmanEastAnim',
-            frameRate: 10,
-            repeat: -1
-        });
-        this.anims.create({
-            frames: this.anims.generateFrameNumbers('pacman', { start: 4, end: 6 }),
-            key: 'pacmanNorthAnim',
-            frameRate: 10,
-            repeat: -1
-        });
-        this.anims.create({
-            frames: this.anims.generateFrameNumbers('pacman', { start: 7, end: 9 }),
-            key: 'pacmanSouthAnim',
-            frameRate: 10,
-            repeat: -1
-        });
-        this.anims.create({
-            frames: this.anims.generateFrameNumbers('pacman', { start: 10, end: 12 }),
-            key: 'pacmanWestAnim',
-            frameRate: 10,
-            repeat: -1
-        });
+        this.physics.add.overlap( player, this.powerUpGroup, this.collectPowerUp, null, this )
 
     }
 
@@ -81,22 +77,12 @@ class GameScene extends Phaser.Scene {
         this.keys()
 
         pacman.update()
+        enemy1.update()
         this.boundaries()
 
-        // this.develop()
         this.drawGui()
 
     }
-
-    // develop(){
-
-    //     let nextTile = `${ pacman.getNextTile().getPosition().x }, ${ pacman.getNextTile().getPosition().y }`
-    //     let currentTile = `${ pacman.getCurrentTile().getPosition().x }, ${ pacman.getCurrentTile().getPosition().y }`
-
-    //     nextTileGUI.setText( "Next Tile: "+nextTile )
-    //     currentTileGUI.setText( "Current Tile: "+currentTile )
-
-    // }
 
     boundaries(){
 
@@ -110,7 +96,7 @@ class GameScene extends Phaser.Scene {
     }
 
     collectPoint( player, point ){
-        
+
         let pointOb = point.getData('TileObject')
         pointOb.setTileValue(2)
         this.points++
@@ -120,21 +106,25 @@ class GameScene extends Phaser.Scene {
             this.nextLevel()
         }
     }
+
+    collectPowerUp( player, powerUp ){
+        let powerUpOB = powerUp.getData('TileObject')
+        
+        this.events.emit('changeGameMode', GameMode.FRIGHTENED );
+
+        powerUp.disableBody( true, true )
+    }
     
     keys(){
-    
-        if (cursors.left.isDown ){
+        
+        if ( cursors.left.isDown )
             pacman.setRequestedDirection(directionEnum.WEST)
-        }
-        else if (cursors.right.isDown ){
+        else if (cursors.right.isDown )
             pacman.setRequestedDirection(directionEnum.EAST)
-        }
-        else if (cursors.up.isDown){
+        else if (cursors.up.isDown)
             pacman.setRequestedDirection(directionEnum.NORTH)
-        }
-        else if (cursors.down.isDown){
+        else if (cursors.down.isDown)
             pacman.setRequestedDirection(directionEnum.SOUTH)
-        }
     
     }
 
@@ -167,4 +157,4 @@ var config = {
     scene: GameScene
 }
 
-var game = new Phaser.Game(config);
+export let game = new Phaser.Game(config);

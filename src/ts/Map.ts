@@ -1,6 +1,7 @@
 import {Tile} from './Tile'
 import { Position } from './game-interfaces/position.interface'
 import { directionEnum } from './game-interfaces/direction.interface';
+import { scene } from './app'
 
 export class Map {
     private MAP_X = 0;
@@ -9,10 +10,8 @@ export class Map {
     private MAP_HEIGHT = 21;
     private TILE_SIZE = 50
     private currentMap: Tile[][] = [[]]
-    private scene;
 
-    constructor( scene ){
-        this.scene = scene
+    constructor( ){
         this.createMap()
     }
 
@@ -21,9 +20,9 @@ export class Map {
             this.currentMap[y] = []
             for( let x = 0; x < this.MAP_WIDTH; x++ ){
 
-                if( mapSetup1[y][x] == 0 ) this.scene.maxPoints++  
+                if( mapSetup1[y][x] == 0 ) scene.maxPoints++  
 
-                let tile = new Tile( this.scene, x, y, mapSetup1[y][x] )
+                let tile = new Tile( x, y, mapSetup1[y][x] )
                 this.currentMap[y][x] = tile
 
             }
@@ -85,7 +84,7 @@ let mapSetup1 = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
     [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
     [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
     [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
     [1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,1],
@@ -93,14 +92,14 @@ let mapSetup1 = [
     [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
     [1,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,1],
     [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
-    [1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1],
+    [1,1,1,1,0,1,0,0,0,0,0,3,0,1,0,1,1,1,1],
     [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
     [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
     [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
     [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
     [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
     [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-    [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+    [1,3,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,3,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ]
