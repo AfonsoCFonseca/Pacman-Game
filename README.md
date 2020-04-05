@@ -19,10 +19,13 @@ An abstract class that represents the basics of the enemy, movement, enum modes 
 This class will be used by the derived class, depending on the type of the enemy:
 - Red Ghost
   The red ghost is the more aggressive of the group of enemies, he simply tracks the Tile where the player is located at.
+  
 - Pink Ghost
-The pink one simulates the ambush, tracking, 2 Tiles ahead of the direction Pacman is facing
+The pink one simulates the ambush, tracking, 2 Tiles ahead of the direction Pacman is facing.
+
 - Blue Ghost
-  The blue works as an extension of the Vector between the red ghost and Pacman. His vector represents twice the length of the red ghost vector. The end of this vector will be the Tile where the blue ghost will go for
+  The blue works as an extension of the Vector between the red ghost and Pacman. His vector represents twice the length of the red ghost vector. The end of this vector will be the Tile where the blue ghost will go for.
+  
 - Orange Ghost
   The orange ghost got 2 states in Chase Mode, if he's at least 4 Tiles away from Pacman, he'll behave like the red ghost, if got to 3 or fewer Tiles near Pacman, he states ll change to his Scatter Behaviour, going for the bottom left corner, when he reaches it, I'll change to the first state again.
 
