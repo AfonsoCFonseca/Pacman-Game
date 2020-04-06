@@ -26,12 +26,25 @@ export function ghostsAnimInit( ){
     let namesArray = [
         'ghostRedEast',
         'ghostRedNorth',
-        'ghostRedWest',
         'ghostRedSouth',
+        'ghostRedWest',
+        'ghostBlueEast',
+        'ghostBlueNorth',
+        'ghostBlueSouth',
+        'ghostBlueWest',
+        'ghostPinkEast',
+        'ghostPinkNorth',
+        'ghostPinkSouth',
+        'ghostPinkWest',
+        'ghostOrangeEast',
+        'ghostOrangeNorth',
+        'ghostOrangeSouth',
+        'ghostOrangeWest',
+
     ]
-    for( var i = 0; i < 4; i++ ){   
+    for( var i = 0; i < namesArray.length; i++ ){   
         scene.anims.create({
-            frames: scene.anims.generateFrameNumbers('ghosts', {start:i}),
+            frames: scene.anims.generateFrameNumbers('ghosts', {start:i, end: i}),
             key: namesArray[i],
         })
     }

@@ -4,6 +4,9 @@ import { Map } from './Map'
 import { directionEnum } from './game-interfaces/direction.interface'
 import { GameMode } from './game-interfaces/modes.interface'
 import { RedGhost } from './Enemy/RedGhost'
+import { BlueGhost } from './Enemy/BlueGhost'
+import { PinkGhost } from './Enemy/PinkGhost'
+import { OrangeGhost } from './Enemy/OrangeGhost'
 import { Enemy } from "./Enemy/Enemy"
 import { pacmanAnimInit, ghostsAnimInit } from "./Utils/animations"
 
@@ -14,9 +17,13 @@ let cursors;
 let player;
 export let pacman: Pacman;
 let enemy1: Enemy
+let enemy2: Enemy
+let enemy3: Enemy
+let enemy4: Enemy
 
 export const MAP_X = 0;
 export const MAP_Y = 100
+let enemy_release_time = 10000
 
 // let nextTileGUI
 // let currentTileGUI
@@ -43,6 +50,7 @@ export class GameScene extends Phaser.Scene {
         this.load.image( 'pointImage', 'assets/point.png' )
         this.load.image( 'power-up', 'assets/power-up.png' )
         this.load.image( 'logo', 'assets/Pac-Man_title.png' )
+        this.load.image( 'door', 'assets/doorTile.png' )
 
         this.imageGroup = this.add.group();
         this.pointsGroup = this.physics.add.staticGroup();
@@ -65,7 +73,10 @@ export class GameScene extends Phaser.Scene {
 
         map = new Map( )
         pacman = new Pacman( player )
-        enemy1 = new RedGhost( { x: 75, y: 75} )
+        enemy1 = new RedGhost()
+        enemy2 = new PinkGhost()
+        enemy3 = new BlueGhost()
+        enemy4 = new OrangeGhost()
 
         this.physics.add.overlap( player, this.pointsGroup, this.collectPoint, null, this )
         this.physics.add.overlap( player, this.powerUpGroup, this.collectPowerUp, null, this )
@@ -77,8 +88,9 @@ export class GameScene extends Phaser.Scene {
         this.keys()
 
         pacman.update()
-        enemy1.update()
         this.boundaries()
+
+        this.events.emit('updateEnemy');
 
         this.drawGui()
 
@@ -86,7 +98,8 @@ export class GameScene extends Phaser.Scene {
 
     boundaries(){
 
-        if( pacman.getNextTile().type == "WALL" ){
+        let nextTile = pacman.getNextTile()
+        if( nextTile.type == "WALL" || nextTile.type === "DOOR" ){
             if( pacman.direction() == "EAST" || pacman.direction() == "WEST" )
                 pacman.findAlternativeWay("long")
             if( pacman.direction() == "NORTH" || pacman.direction() == "SOUTH" )

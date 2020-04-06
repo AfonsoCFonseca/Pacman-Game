@@ -3,36 +3,50 @@ import { GameMode } from '../game-interfaces/modes.interface'
 import { Tile, tileType } from '../Tile'
 import { map } from '../app'
 import { directionEnum } from '../game-interfaces/direction.interface'
-import { requestMovementInformation } from '../Utils/utils'
+import { requestMovementInformation, opositeDirection } from '../Utils/utils'
+import { scene } from '../app'
 
 export abstract class Enemy {
     public SPEED = 3
+    protected isFree: boolean = false
+    protected timeToSetFree: number | null;
     private mode: GameMode
     public position: Position
     private destinyTile: Tile 
     protected ghost
-    public actualDirection: directionEnum = directionEnum.EAST
+    public actualDirection: directionEnum = directionEnum.NORTH
     public requestedDirection: directionEnum
+    protected ghostType: string
 
-    constructor({ x, y }, ghost ){
+    constructor(position: Position, ghost ){
         this.ghost = ghost
         this.mode = GameMode.CHASE
-        this.setPosition({ x, y })
+        this.setPosition(position)
+        this.ghostType = ghost.type
+        this.timeToSetFree = ghost.timeToSetFree
+        this.ghost.anims.play(`ghost${this.ghostType}East`) 
+
+        this.update = this.update.bind(this);
+        scene.events.on('updateEnemy' , this.update )
     }
 
     getPosition(): Position{
         return this.position
     }
 
-    protected setPosition({ x, y }:Position){
+    public setEnemyFree(): void{
+        this.isFree = true
+    }
+
+    protected setPosition({ x, y }:Position): void{
         this.position = { x, y }
     }
 
-    getCurrentTile(){
+    getCurrentTile():Tile{
         return map.getTile(this.position)
     }
 
-    protected setDestinyTile( tile: Tile ){
+    protected setDestinyTile( tile: Tile ): void{
         this.destinyTile = tile
     }
 
@@ -40,7 +54,7 @@ export abstract class Enemy {
         return this.destinyTile 
     }
 
-    protected setGameMode( mode: GameMode ){
+    protected setGameMode( mode: GameMode ):void{
         this.mode = mode
     }
 
@@ -53,48 +67,79 @@ export abstract class Enemy {
         this.findRoute()
         
         this.actualDirection = requestMovementInformation( this )
-        this.move()
-    }
-
-    private move(){
-
-        switch(this.actualDirection) {
-            case "SOUTH":
-                this.ghost.anims.play('ghostRedSouth') 
-                this.ghost.y+= this.SPEED
-            break;
-            case "NORTH":
-                this.ghost.anims.play('ghostRedNorth') 
-                this.ghost.y-= this.SPEED
-            break;
-            case "WEST":
-                this.ghost.anims.play('ghostRedWest') 
-                this.ghost.x-= this.SPEED
-            break;
-            case "EAST":
-                this.ghost.anims.play('ghostRedEast') 
-                this.ghost.x+= this.SPEED
-            break;
+        if( this.isFree ) this.move()
+        if( scene.time.now > this.timeToSetFree && !this.isFree ){
+            console.log("one")
+            this.setEnemyFree()
         }
     }
 
+    private move(){
+        switch(this.actualDirection) {
+            case "SOUTH":
+                this.ghost.anims.play(`ghost${this.ghostType}South`) 
+                this.ghost.y+= this.SPEED
+            break;
+            case "NORTH":
+                this.ghost.anims.play(`ghost${this.ghostType}North`) 
+                this.ghost.y-= this.SPEED
+            break;
+            case "WEST":
+                this.ghost.anims.play(`ghost${this.ghostType}West`) 
+                this.ghost.x-= this.SPEED
+            break;
+            case "EAST":
+                this.ghost.anims.play(`ghost${this.ghostType}East`) 
+                this.ghost.x+= this.SPEED
+        }
+
+    }
+
     private findRoute(): directionEnum {
-        let chosenDirections: directionEnum[] = []
-        let { x, y } = this.getCurrentTile().getPosition()
+        let postion = this.getCurrentTile().getPosition()
         let destinyTilePosition = this.destinyTile.getPosition() 
-
-        chosenDirections.push( x < destinyTilePosition.x ? directionEnum.EAST: directionEnum.WEST)
-        chosenDirections.push( y < destinyTilePosition.y ? directionEnum.SOUTH: directionEnum.NORTH)
-
+        let chosenDirections = this.makePriority( postion, destinyTilePosition)
+        
         for( var i = 0; i < chosenDirections.length; i++){
             let futureTile = map.getNeighborTile( this.getCurrentTile(), chosenDirections[i])
-            if( futureTile.type !== tileType.WALL ){
+            if( futureTile.type !== tileType.WALL &&
+                futureTile.type !== tileType.DOOR &&  
+                chosenDirections[i] !== opositeDirection(this.actualDirection)){
                 this.requestedDirection = chosenDirections[i]
                 break
             }
         }
 
         return this.requestedDirection
+    }
+
+    private makePriority( {x, y}:Position, destinyTilePosition: Position): directionEnum[]{
+        let chosenDirections: directionEnum[] = []
+        let xDistance = x - (-destinyTilePosition.x)
+        let yDistance = y - (-destinyTilePosition.y)
+        let mDirArr = [directionEnum.EAST, directionEnum.WEST, directionEnum.NORTH, directionEnum.SOUTH]
+
+        if( xDistance <= yDistance){
+            chosenDirections.push( x < destinyTilePosition.x ? directionEnum.EAST: directionEnum.WEST)
+            chosenDirections.push( y < destinyTilePosition.y ? directionEnum.SOUTH: directionEnum.NORTH)
+        }
+        else{
+            chosenDirections.push( y < destinyTilePosition.y ? directionEnum.SOUTH: directionEnum.NORTH)
+            chosenDirections.push( x < destinyTilePosition.x ? directionEnum.EAST: directionEnum.WEST)
+        }
+
+        for( var i = 0; i < chosenDirections.length; i++ ){
+            for( var j = 0; j < mDirArr.length; j++ ){
+
+                if( mDirArr[j] === chosenDirections[i])
+                    mDirArr.splice(j, 1)
+                
+            }
+        }
+
+        mDirArr.forEach( dir => chosenDirections.push( dir ) )
+
+        return chosenDirections
     }
 
 }

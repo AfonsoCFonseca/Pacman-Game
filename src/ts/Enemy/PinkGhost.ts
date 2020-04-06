@@ -5,16 +5,15 @@ import { map, pacman } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
 import { scene } from '../app'
 
-export class RedGhost extends Enemy {
+export class PinkGhost extends Enemy {
 
     constructor( ){
-        let position = { x: 475, y: 375 }
-        let ghost = scene.physics.add.sprite( position.x, position.y,"ghostRedAnim" )
-        ghost.type = "Red"
-        ghost.timeToSetFree = null
+        let position = {x: 475, y: 475 }
+        let ghost = scene.physics.add.sprite( position.x, position.y,"ghosts" )
+        ghost.type = "Pink"
+        ghost.timeToSetFree = 16000
         scene.enemyGroup.add(ghost);
         super( position, ghost )
-        this.setEnemyFree()
 
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )

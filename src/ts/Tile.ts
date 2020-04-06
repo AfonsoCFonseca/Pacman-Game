@@ -5,7 +5,9 @@ export enum tileType {
     EMPTY = "EMPTY",
     POINT = "POINT",
     WALL = "WALL",
-    POWER_UP = "POWER_UP"
+    POWER_UP = "POWER_UP",
+    DOOR = "DOOR",
+    TELEPORT = "TELEPORT"
 }
 
 export class Tile {
@@ -63,6 +65,18 @@ export class Tile {
                 'power-up').setOrigin(0,0)
             
                 powerup.setData('TileObject', this);
+        }
+        else if( value == 4 ){
+            this.type = tileType.DOOR
+
+            let door = scene.add.image( 
+                this.position.x * this.TILE_SIZE,
+                this.position.y * this.TILE_SIZE,
+                  "door" ).setOrigin(0,0)
+            scene.imageGroup.add(door);
+        }
+        else if( value == 5 ){
+            this.type = tileType.DOOR
         }
     }
 }
