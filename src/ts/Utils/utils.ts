@@ -35,3 +35,47 @@ export function opositeDirection( dir: directionEnum): directionEnum{
             return directionEnum.EAST
     }
 }
+
+export function giveLimitsOfMapByZone(zone: string){
+    let halfMapX = ( map.MAP_WIDTH / 2 ) - 1
+    let halfMapY =  ( map.MAP_HEIGHT / 2 ) - 1
+
+    switch( zone ){
+        case "NW": 
+            return {
+                minX: 1,
+                minY: 1,
+                maxX: halfMapX,
+                maxY: halfMapY,
+            }
+        case "NE":
+            return {
+                minX: halfMapX,
+                minY: 1,
+                maxX: map.MAP_WIDTH - 1,
+                maxY: halfMapY,
+            }
+        case "SE":
+            return {
+                minX: halfMapX,
+                minY: halfMapY,
+                maxX: map.MAP_WIDTH - 1,
+                maxY: map.MAP_HEIGHT - 1
+            }
+        case "SW":
+            return {
+                minX:1,
+                minY:halfMapY,
+                maxX:halfMapX,
+                maxY:map.MAP_HEIGHT - 1
+            }
+        case "ANYWHERE":
+            return {
+                minX:1,
+                minY:1,
+                maxX:map.MAP_WIDTH - 1,
+                maxY:map.MAP_HEIGHT - 1
+            }
+    }
+
+}

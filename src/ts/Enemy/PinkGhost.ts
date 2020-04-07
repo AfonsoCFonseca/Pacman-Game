@@ -17,9 +17,6 @@ export class PinkGhost extends Enemy {
 
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )
-        
-        this.changeGameMode = this.changeGameMode.bind(this);
-        scene.events.on('changeGameMode' , this.changeGameMode )
 
     }
 
@@ -31,21 +28,6 @@ export class PinkGhost extends Enemy {
 
     private findDestinyTile(): Tile{
         return map.getTile( pacman.getCurrentPosition() )
-    }
-
-    private changeGameMode( mode: GameMode ):void{
-        this.setGameMode( mode )
-        
-        switch( mode ){
-            case GameMode.CHASE:
-                this.chase()
-            break;
-            case GameMode.FRIGHTENED:
-                this.frightened()
-            break;
-            case GameMode.SCATTER:
-                this.scatter()
-        }
     }
 
     private chase(){

@@ -1,6 +1,6 @@
 import "phaser"
 import { Pacman } from './Pacman'
-import { Map } from './Map'
+import { Map } from './Map/Map'
 import { directionEnum } from './game-interfaces/direction.interface'
 import { GameMode } from './game-interfaces/modes.interface'
 import { RedGhost } from './Enemy/RedGhost'
@@ -21,9 +21,7 @@ let enemy2: Enemy
 let enemy3: Enemy
 let enemy4: Enemy
 
-export const MAP_X = 0;
-export const MAP_Y = 100
-let enemy_release_time = 10000
+const POWER_UP_TIME = 5000
 
 // let nextTileGUI
 // let currentTileGUI
@@ -121,11 +119,12 @@ export class GameScene extends Phaser.Scene {
     }
 
     collectPowerUp( player, powerUp ){
-        let powerUpOB = powerUp.getData('TileObject')
-        
-        this.events.emit('changeGameMode', GameMode.FRIGHTENED );
-
+        this.events.emit('setGameMode', GameMode.FRIGHTENED );
         powerUp.disableBody( true, true )
+
+        setTimeout(() => {
+            this.events.emit('setGameMode', GameMode.CHASE );
+        }, POWER_UP_TIME )
     }
     
     keys(){

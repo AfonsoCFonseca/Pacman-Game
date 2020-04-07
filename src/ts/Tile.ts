@@ -15,7 +15,7 @@ export class Tile {
     protected TILE_SIZE = 50
     protected POINT_SIZE = 10
     protected POWER_UP_SIZE = 18
-    public type = tileType.EMPTY
+    public type: tileType = tileType.EMPTY
     private position: Position;
     public _id: string;
 

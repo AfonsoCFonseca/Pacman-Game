@@ -10,13 +10,14 @@ export abstract class Enemy {
     public SPEED = 3
     protected isFree: boolean = false
     protected timeToSetFree: number | null;
-    private mode: GameMode
+    protected mode: GameMode
     public position: Position
     private destinyTile: Tile 
     protected ghost
     public actualDirection: directionEnum = directionEnum.NORTH
     public requestedDirection: directionEnum
     protected ghostType: string
+    protected frightenedTile = map.getRandomAvailableTile( "anywhere" )
 
     constructor(position: Position, ghost ){
         this.ghost = ghost
@@ -27,7 +28,10 @@ export abstract class Enemy {
         this.ghost.anims.play(`ghost${this.ghostType}East`) 
 
         this.update = this.update.bind(this);
+        this.setGameMode = this.setGameMode.bind( this )
+
         scene.events.on('updateEnemy' , this.update )
+        scene.events.on('setGameMode' , this.setGameMode )
     }
 
     getPosition(): Position{
@@ -58,20 +62,15 @@ export abstract class Enemy {
         this.mode = mode
     }
 
-    protected frightened(){
-        
-    }
-
     public update(){
         this.setPosition(this.ghost)
         this.findRoute()
         
         this.actualDirection = requestMovementInformation( this )
         if( this.isFree ) this.move()
-        if( scene.time.now > this.timeToSetFree && !this.isFree ){
-            console.log("one")
+        if( scene.time.now > this.timeToSetFree && !this.isFree )
             this.setEnemyFree()
-        }
+        
     }
 
     private move(){
@@ -96,20 +95,28 @@ export abstract class Enemy {
     }
 
     private findRoute(): directionEnum {
+
+        if( this.mode == GameMode.FRIGHTENED && this.getCurrentTile() == this.frightenedTile ){
+            this.frightenedTile = map.getRandomAvailableTile( "anywhere" )
+            return
+        } 
+
         let postion = this.getCurrentTile().getPosition()
         let destinyTilePosition = this.destinyTile.getPosition() 
         let chosenDirections = this.makePriority( postion, destinyTilePosition)
         
         for( var i = 0; i < chosenDirections.length; i++){
             let futureTile = map.getNeighborTile( this.getCurrentTile(), chosenDirections[i])
-            if( futureTile.type !== tileType.WALL &&
-                futureTile.type !== tileType.DOOR &&  
+            if( futureTile.type !== tileType.WALL &&  
                 chosenDirections[i] !== opositeDirection(this.actualDirection)){
+                    if( futureTile.type === tileType.DOOR && this.actualDirection === "NORTH"){
+                        chosenDirections[i] = directionEnum.NORTH
+                    }
                 this.requestedDirection = chosenDirections[i]
                 break
             }
         }
-
+        
         return this.requestedDirection
     }
 
