@@ -21,13 +21,22 @@ export class OrangeGhost extends Enemy {
     }
 
     public update(){
-        let newTile = this.findDestinyTile()
-        this.setDestinyTile( newTile )
+        if( this.isFree ){
+            let newTile = this.findDestinyTile()
+            this.setDestinyTile( newTile )
+        } 
         super.update()
     }
 
     private findDestinyTile(): Tile{
-        return map.getTile( pacman.getCurrentPosition() )
+        switch( this.mode ){
+            case GameMode.CHASE:
+                return map.getTile( pacman.getCurrentPosition() )
+            case GameMode.FRIGHTENED:
+                return this.frightenedTile
+            case GameMode.SCATTER:
+                return map.getTile( pacman.getCurrentPosition() )
+        }
     }
 
     private chase(){

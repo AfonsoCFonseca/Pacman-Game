@@ -22,8 +22,10 @@ export class RedGhost extends Enemy {
     }
 
     public update(){
-        let newTile = this.findDestinyTile()
-        this.setDestinyTile( newTile )
+        if( this.isFree ){
+            let newTile = this.findDestinyTile()
+            this.setDestinyTile( newTile )
+        } 
         super.update()
     }
 

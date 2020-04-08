@@ -9,6 +9,9 @@ import { PinkGhost } from './Enemy/PinkGhost'
 import { OrangeGhost } from './Enemy/OrangeGhost'
 import { Enemy } from "./Enemy/Enemy"
 import { pacmanAnimInit, ghostsAnimInit } from "./Utils/animations"
+import { Utils} from "./Utils/utils"
+
+
 
 export let scene
 
@@ -49,6 +52,7 @@ export class GameScene extends Phaser.Scene {
         this.load.image( 'power-up', 'assets/power-up.png' )
         this.load.image( 'logo', 'assets/Pac-Man_title.png' )
         this.load.image( 'door', 'assets/doorTile.png' )
+        this.load.image( 'blueDot', 'assets/blueDot.png' )
 
         this.imageGroup = this.add.group();
         this.pointsGroup = this.physics.add.staticGroup();
@@ -99,9 +103,9 @@ export class GameScene extends Phaser.Scene {
         let nextTile = pacman.getNextTile()
         if( nextTile.type == "WALL" || nextTile.type === "DOOR" ){
             if( pacman.direction() == "EAST" || pacman.direction() == "WEST" )
-                pacman.findAlternativeWay("long")
+                pacman.setRequestedDirection( Utils.findAlternativeWay('long') )
             if( pacman.direction() == "NORTH" || pacman.direction() == "SOUTH" )
-                pacman.findAlternativeWay("lat")
+                pacman.setRequestedDirection( Utils.findAlternativeWay('lat') )
         }
     
     }

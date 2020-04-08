@@ -2,7 +2,7 @@ import {Tile} from '../Tile'
 import { Position } from '../game-interfaces/position.interface'
 import { directionEnum } from '../game-interfaces/direction.interface';
 import { scene } from '../app'
-import { giveLimitsOfMapByZone } from '../Utils/utils'
+import { Utils } from '../Utils/utils'
 import { mapSetup1, mapSetup } from './Layouts'
 
 export class Map {
@@ -61,7 +61,7 @@ export class Map {
         zone = zone.toUpperCase()
 
         do{
-            let limits = giveLimitsOfMapByZone( zone )
+            let limits = Utils.giveLimitsOfMapByZone( zone )
             var randomX = Math.floor(Math.random() * (+limits.maxX - +limits.minX)) + +limits.minX; 
             var randomY = Math.floor(Math.random() * (+limits.maxY - +limits.minY)) + +limits.minY; 
             destinyTile = this.currentMap[randomY][randomX]

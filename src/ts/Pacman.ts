@@ -2,7 +2,7 @@ import { map } from './app'
 import { Tile, tileType } from './Tile'
 import { Position} from './game-interfaces/position.interface'
 import { directionEnum } from './game-interfaces/direction.interface'
-import { requestMovementInformation } from './Utils/utils'
+import { Utils } from './Utils/utils'
 
 export class Pacman {
 
@@ -58,7 +58,7 @@ export class Pacman {
         this.setCurrentPosition( this.player )
         this.setNextTile()
 
-        this.actualDirection = requestMovementInformation( this )
+        this.actualDirection = Utils.requestMovementInformation( this )
         this.move()
 
     }
@@ -85,19 +85,4 @@ export class Pacman {
         }
     }
 
-    public findAlternativeWay( nextWay: 'lat' | 'long' ){
-        
-        var rand = Math.floor(Math.random() * 10) + 1
-        if( nextWay == "long" ){
-            if( rand%2 == 0 )
-                this.requestedDirection = directionEnum.NORTH
-            else this.requestedDirection = directionEnum.SOUTH
-        }
-        else if( nextWay == "lat"){
-            if( rand%2 == 0 )
-                this.requestedDirection = directionEnum.EAST
-            else this.requestedDirection = directionEnum.WEST
-        }
-        
-    }
 }

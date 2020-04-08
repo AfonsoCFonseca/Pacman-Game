@@ -3,7 +3,7 @@ import { GameMode } from '../game-interfaces/modes.interface'
 import { Tile, tileType } from '../Tile'
 import { map } from '../app'
 import { directionEnum } from '../game-interfaces/direction.interface'
-import { requestMovementInformation, opositeDirection } from '../Utils/utils'
+import { Utils } from '../Utils/utils'
 import { scene } from '../app'
 
 export abstract class Enemy {
@@ -66,7 +66,7 @@ export abstract class Enemy {
         this.setPosition(this.ghost)
         this.findRoute()
         
-        this.actualDirection = requestMovementInformation( this )
+        this.actualDirection = Utils.requestMovementInformation( this )
         if( this.isFree ) this.move()
         if( scene.time.now > this.timeToSetFree && !this.isFree )
             this.setEnemyFree()
@@ -108,7 +108,7 @@ export abstract class Enemy {
         for( var i = 0; i < chosenDirections.length; i++){
             let futureTile = map.getNeighborTile( this.getCurrentTile(), chosenDirections[i])
             if( futureTile.type !== tileType.WALL &&  
-                chosenDirections[i] !== opositeDirection(this.actualDirection)){
+                chosenDirections[i] !== Utils.opositeDirection(this.actualDirection)){
                     if( futureTile.type === tileType.DOOR && this.actualDirection === "NORTH"){
                         chosenDirections[i] = directionEnum.NORTH
                     }
