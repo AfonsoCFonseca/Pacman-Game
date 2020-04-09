@@ -1,9 +1,10 @@
 import { Position } from '../game-interfaces/position.interface'
 import { Enemy } from './Enemy'
-import { Tile } from '../Tile';
+import { Tile,tileType } from '../Tile';
 import { map, pacman } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
 import { scene } from '../app'
+import { Utils } from '../Utils/utils'
 
 export class PinkGhost extends Enemy {
 
@@ -31,7 +32,7 @@ export class PinkGhost extends Enemy {
     private findDestinyTile(): Tile{
         switch( this.mode ){
             case GameMode.CHASE:
-                return map.getTile( pacman.getCurrentPosition() )
+                return this.chase()
             case GameMode.FRIGHTENED:
                 return this.frightenedTile
             case GameMode.SCATTER:
@@ -39,8 +40,21 @@ export class PinkGhost extends Enemy {
         }
     }
 
-    private chase(){
+    private chase():Tile{
+        let pacmanTile = map.getTile( pacman.getCurrentPosition() )
+        let pacmanDirection = pacman.actualDirection
+        let nextTile = map.getNeighborTile(pacmanTile,pacmanDirection)
+        let previousTile = pacmanTile
 
+        for( var i = 0;i < 2; i++ ){
+            do{
+                let randDir = Utils.getRandomDir()
+                nextTile = map.getNeighborTile(previousTile,randDir)
+            }while( nextTile.type != tileType.EMPTY && nextTile.type != tileType.POINT )
+            previousTile = nextTile
+        }
+
+        return nextTile
     }
 
     private scatter(){

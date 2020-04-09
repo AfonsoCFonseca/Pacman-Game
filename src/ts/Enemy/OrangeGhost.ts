@@ -41,6 +41,10 @@ export class OrangeGhost extends Enemy {
 
     private chase(){
 
+        // scene.add.image( 
+        //     nextTile.getPosition().x * 50 + 18,
+        //     nextTile.getPosition().y * 50 + 18,
+        //       "blueDot" ).setOrigin(0,0)
     }
 
     private scatter(){
