@@ -1,5 +1,5 @@
-import { map } from '../app'
-import { tileType } from '../Tile'
+import { map, scene } from '../app'
+import { tileType, Tile } from '../Tile'
 import { directionEnum } from '../game-interfaces/direction.interface'
 
 export class Utils {
@@ -8,19 +8,18 @@ export class Utils {
         let { x, y } = position
         let neighborTile = map.getNeighborTile( map.getTile( position ), requestedDirection )
     
-        if( neighborTile.type === tileType.WALL )
+        if( neighborTile.type === tileType.WALL ||
+             ( neighborTile.type === tileType.DOOR && requestedDirection != "NORTH"))
             return actualDirection
-    
+
         for( var i= 0; i < SPEED; i++ ){
-            if( actualDirection == "SOUTH" && (y+i) % 25 === 0 && (y+i) % 2 !== 0 )
-                return requestedDirection
-            else if( actualDirection == "NORTH" && (y-i) % 25 === 0 && (y-i) % 2 !== 0 )
-                return requestedDirection
-            else if( actualDirection == "WEST" && (x-i) % 25 === 0 && (x-i) % 2 !== 0 )
-                return requestedDirection
-            else if( actualDirection == "EAST" &&(x+i) % 25 === 0 && (x+i) % 2 !== 0 )
-                return requestedDirection
+            if( ( actualDirection == "SOUTH" && (y+i) % 25 === 0 && (y+i) % 2 !== 0 ) ||
+                ( actualDirection == "NORTH" && (y-i) % 25 === 0 && (y-i) % 2 !== 0 ) ||
+                ( actualDirection == "WEST" && (x-i) % 25 === 0 && (x-i) % 2 !== 0 ) ||
+                ( actualDirection == "EAST" &&(x+i) % 25 === 0 && (x+i) % 2 !== 0 ) )
+                    return requestedDirection
         }
+
         return actualDirection
     }
 
@@ -38,7 +37,7 @@ export class Utils {
     }
 
     public static giveLimitsOfMapByZone(zone: string){
-        let halfMapX = ( map.MAP_WIDTH / 2 ) - 1
+        let halfMapX = ( map.MAP_TILE_WIDTH / 2 ) - 1
         let halfMapY =  ( map.MAP_HEIGHT / 2 ) - 1
     
         switch( zone ){
@@ -53,43 +52,52 @@ export class Utils {
                 return {
                     minX: halfMapX,
                     minY: 1,
-                    maxX: map.MAP_WIDTH - 1,
+                    maxX: map.MAP_TILE_WIDTH - 1,
                     maxY: halfMapY,
                 }
             case "SE":
                 return {
                     minX: halfMapX,
                     minY: halfMapY,
-                    maxX: map.MAP_WIDTH - 1,
-                    maxY: map.MAP_HEIGHT - 1
+                    maxX: map.MAP_TILE_WIDTH - 1,
+                    maxY: map.MAP_TILE_HEIGHT - 1
                 }
             case "SW":
                 return {
                     minX:1,
                     minY:halfMapY,
                     maxX:halfMapX,
-                    maxY:map.MAP_HEIGHT - 1
+                    maxY:map.MAP_TILE_HEIGHT - 1
                 }
             case "ANYWHERE":
                 return {
                     minX:1,
                     minY:1,
-                    maxX:map.MAP_WIDTH - 1,
-                    maxY:map.MAP_HEIGHT - 1
+                    maxX:map.MAP_TILE_WIDTH - 1,
+                    maxY:map.MAP_TILE_HEIGHT - 1
                 }
         }
     
     }
     
-    public static findAlternativeWay( nextWay: 'lat' | 'long' ): directionEnum {
+    public static findAlternativeWay( nextWay: 'lat' | 'long', currentTile: Tile ): directionEnum {
     
         var rand = Math.floor(Math.random() * 10) + 1
+        var dir: directionEnum
         if( nextWay == "long" ){
-            return rand%2 == 0 ? directionEnum.NORTH : directionEnum.SOUTH
+            dir = rand%2 == 0 ? directionEnum.NORTH : directionEnum.SOUTH
         }
         else if( nextWay == "lat"){
-            return rand%2 == 0 ? directionEnum.EAST : directionEnum.WEST
+            dir = rand%2 == 0 ? directionEnum.EAST : directionEnum.WEST
         }
+
+        // if( map.getNeighborTile(currentTile, dir ).type == "WALL" ){
+        //     Utils.targetDrawer( map.getNeighborTile(currentTile, dir ) )
+        //     dir = Utils.opositeDirection( dir )
+        //     console.log("aqui")
+        // }
+
+        return dir
         
     }
     
@@ -105,5 +113,28 @@ export class Utils {
             case 4:
                 return directionEnum.SOUTH
         }
+    }
+
+        
+    public static distance(x1,y1,x2,y2){
+        var dx = x1 - x2;
+        var dy = y1 - y2;
+
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public static targetDrawer(target:Tile, verbose: boolean = false ){
+        let { x, y } = target.getPosition()
+        
+        scene.add.image( 
+            x * 50 + 18,
+            y * 50 + 18,
+              "blueDot" ).setOrigin(0,0)
+
+        if( verbose ){
+            console.log( x )
+            console.log( y )
+        }
+
     }
 }

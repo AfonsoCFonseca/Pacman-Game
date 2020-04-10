@@ -4,8 +4,11 @@ import { Tile } from '../Tile';
 import { map, pacman } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
 import { scene } from '../app'
+import { Utils } from '../Utils/utils';
 
 export class OrangeGhost extends Enemy {
+    tileFarPosition:Tile
+    chaseState: 'far' | 'close'
 
     constructor( ){
         let position = {x: 425, y: 475 }
@@ -15,6 +18,7 @@ export class OrangeGhost extends Enemy {
         scene.enemyGroup.add(ghost);
         super( position, ghost)
 
+        this.tileFarPosition = map.getTile({x:75,y:900})
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )
 
@@ -31,7 +35,7 @@ export class OrangeGhost extends Enemy {
     private findDestinyTile(): Tile{
         switch( this.mode ){
             case GameMode.CHASE:
-                return map.getTile( pacman.getCurrentPosition() )
+                return this.chase()
             case GameMode.FRIGHTENED:
                 return this.frightenedTile
             case GameMode.SCATTER:
@@ -41,10 +45,17 @@ export class OrangeGhost extends Enemy {
 
     private chase(){
 
-        // scene.add.image( 
-        //     nextTile.getPosition().x * 50 + 18,
-        //     nextTile.getPosition().y * 50 + 18,
-        //       "blueDot" ).setOrigin(0,0)
+        let pacmanPosition = pacman.getCurrentPosition()
+        let ghostPosition = this.getPosition()
+        let dist = Utils.distance( pacmanPosition.x, pacmanPosition.y, ghostPosition.x, ghostPosition.y )
+
+        if( dist < 150 )
+            this.chaseState = 'far'
+        else if( this.getCurrentTile() == this.tileFarPosition )
+            this.chaseState = 'close'
+
+        return this.chaseState == 'far' ?  this.tileFarPosition : map.getTile( pacman.getCurrentPosition() )  
+
     }
 
     private scatter(){

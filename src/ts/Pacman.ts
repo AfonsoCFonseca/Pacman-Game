@@ -42,6 +42,10 @@ export class Pacman {
     }
 
     public setRequestedDirection( reqDir : directionEnum ){
+        let getNeighborTile = map.getNeighborTile(this.getCurrentTile(), reqDir)
+        if( getNeighborTile.type == "WALL" || getNeighborTile.type == "DOOR")
+            return
+        
         this.requestedDirection = reqDir
     }
 
@@ -59,6 +63,7 @@ export class Pacman {
         this.setNextTile()
 
         this.actualDirection = Utils.requestMovementInformation( this )
+
         this.move()
 
     }

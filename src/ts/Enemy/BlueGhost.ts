@@ -3,16 +3,13 @@ import { Enemy } from './Enemy'
 import { Tile, tileType } from '../Tile';
 import { map, pacman } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
-import { scene } from '../app'
+import { scene, redGhost } from '../app'
 import { directionEnum } from '../game-interfaces/direction.interface';
-import { Utils } from '../Utils/utils'
 
 export class BlueGhost extends Enemy {
-    tileFarPosition:Tile
-    chaseState: 'far' | 'close'
 
     constructor( ){
-        let position = {x: 526, y: 475 }
+        let position = {x: 525, y: 475 }
         let ghost = scene.physics.add.sprite( position.x, position.y,"ghosts" )
 
         ghost.type = "Blue"
@@ -20,12 +17,12 @@ export class BlueGhost extends Enemy {
         scene.enemyGroup.add(ghost);
         super( position, ghost )
 
-        this.tileFarPosition = map.getTile({x:75,y:900})
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )
     }
 
     public update(){
+
         if( this.isFree ){
             let newTile = this.findDestinyTile()
             this.setDestinyTile( newTile )
@@ -46,25 +43,36 @@ export class BlueGhost extends Enemy {
 
     }
 
-    private chase():Tile{
-        let pacmanPosition = pacman.getCurrentPosition()
-        let ghostPosition = this.getPosition()
-        let dist = this.distance( pacmanPosition.x, pacmanPosition.y, ghostPosition.x, ghostPosition.y )
-
-        if( dist < 150 )
-            this.chaseState = 'far'
-        else if( this.getCurrentTile() == this.tileFarPosition )
-            this.chaseState = 'close'
-
-        return this.chaseState == 'far' ?  this.tileFarPosition : map.getTile( pacman.getCurrentPosition() )  
-
+    private diferenceBetween( source:number, target:number ):number{
+        return Math.abs( target - source )
     }
+    
 
-    private distance(x1,y1,x2,y2){
-        var dx = x1 - x2;
-        var dy = y1 - y2;
+    private chase():Tile{
+        let x,y: number
+        let pacmanPosition = pacman.getCurrentPosition()
+        let redPosition = {x:100,y:100}
+        let distanceX = this.diferenceBetween( redPosition.x, pacmanPosition.x )
+        let distanceY = this.diferenceBetween( redPosition.y, pacmanPosition.y )
 
-        return Math.sqrt(dx * dx + dy * dy);
+        if( redPosition.x >= pacmanPosition.x)
+            distanceX = -distanceX
+            
+        if( redPosition.y >= pacmanPosition.y )
+            distanceY = -distanceY
+
+        x = pacmanPosition.x + distanceX
+        y = pacmanPosition.y + distanceY
+
+        if( x >= map.MAP_WIDTH - 50 )
+            x = map.MAP_WIDTH - 50
+        else if( x <= 0 ) x = 100
+
+        if( y >= map.MAP_HEIGHT - 50 )
+             y = map.MAP_HEIGHT - 50
+        else if( y <= 0 ) y = 100
+
+        return map.getTile({x,y}, "position")
     }
 
     private scatter(){

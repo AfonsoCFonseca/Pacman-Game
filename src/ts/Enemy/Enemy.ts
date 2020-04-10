@@ -64,10 +64,13 @@ export abstract class Enemy {
 
     public update(){
         this.setPosition(this.ghost)
-        this.findRoute()
         
-        this.actualDirection = Utils.requestMovementInformation( this )
-        if( this.isFree ) this.move()
+        if( this.isFree ){
+            this.findRoute()
+            this.actualDirection = Utils.requestMovementInformation( this )
+            this.move()  
+        } 
+        
         if( scene.time.now > this.timeToSetFree && !this.isFree )
             this.setEnemyFree()
         
@@ -101,20 +104,29 @@ export abstract class Enemy {
             return
         } 
 
-        let postion = this.getCurrentTile().getPosition()
+        let position = this.getCurrentTile().getPosition()
         let destinyTilePosition = this.destinyTile.getPosition() 
-        let chosenDirections = this.makePriority( postion, destinyTilePosition)
+        let chosenDirections = this.makePriority( position, destinyTilePosition)
         
         for( var i = 0; i < chosenDirections.length; i++){
             let futureTile = map.getNeighborTile( this.getCurrentTile(), chosenDirections[i])
-            if( futureTile.type !== tileType.WALL &&  
+
+            if( futureTile.type !== tileType.WALL &&
                 chosenDirections[i] !== Utils.opositeDirection(this.actualDirection)){
+
                     if( futureTile.type === tileType.DOOR && this.actualDirection === "NORTH"){
-                        chosenDirections[i] = directionEnum.NORTH
+                            chosenDirections[i] = directionEnum.NORTH
+
                     }
+
                 this.requestedDirection = chosenDirections[i]
                 break
+
             }
+           
+            // if( futureTile.type === tileType.DOOR && this.actualDirection === "NORTH"){
+            //     chosenDirections[i] = directionEnum.NORTH
+            // }
         }
         
         return this.requestedDirection
@@ -122,11 +134,11 @@ export abstract class Enemy {
 
     private makePriority( {x, y}:Position, destinyTilePosition: Position): directionEnum[]{
         let chosenDirections: directionEnum[] = []
-        let xDistance = x - (-destinyTilePosition.x)
-        let yDistance = y - (-destinyTilePosition.y)
+        let xDistance = x - Math.abs(destinyTilePosition.x)
+        let yDistance = y - Math.abs(destinyTilePosition.y)
         let mDirArr = [directionEnum.EAST, directionEnum.WEST, directionEnum.NORTH, directionEnum.SOUTH]
 
-        if( xDistance <= yDistance){
+        if( xDistance > yDistance){
             chosenDirections.push( x < destinyTilePosition.x ? directionEnum.EAST: directionEnum.WEST)
             chosenDirections.push( y < destinyTilePosition.y ? directionEnum.SOUTH: directionEnum.NORTH)
         }

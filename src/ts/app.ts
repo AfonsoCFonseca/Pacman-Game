@@ -11,18 +11,15 @@ import { Enemy } from "./Enemy/Enemy"
 import { pacmanAnimInit, ghostsAnimInit } from "./Utils/animations"
 import { Utils} from "./Utils/utils"
 
-
-
 export let scene
-
 export let map: Map
 let cursors;
 let player;
 export let pacman: Pacman;
-let enemy1: Enemy
-let enemy2: Enemy
-let enemy3: Enemy
-let enemy4: Enemy
+export let redGhost: Enemy
+let pinkGhost: Enemy
+let blueGhost: Enemy
+let orangeGhost: Enemy
 
 const POWER_UP_TIME = 5000
 
@@ -75,10 +72,10 @@ export class GameScene extends Phaser.Scene {
 
         map = new Map( )
         pacman = new Pacman( player )
-        enemy1 = new RedGhost()
-        enemy2 = new PinkGhost()
-        enemy3 = new BlueGhost()
-        enemy4 = new OrangeGhost()
+        redGhost = new RedGhost()
+        pinkGhost = new PinkGhost()
+        blueGhost = new BlueGhost()
+        orangeGhost = new OrangeGhost()
 
         this.physics.add.overlap( player, this.pointsGroup, this.collectPoint, null, this )
         this.physics.add.overlap( player, this.powerUpGroup, this.collectPowerUp, null, this )
@@ -103,9 +100,9 @@ export class GameScene extends Phaser.Scene {
         let nextTile = pacman.getNextTile()
         if( nextTile.type == "WALL" || nextTile.type === "DOOR" ){
             if( pacman.direction() == "EAST" || pacman.direction() == "WEST" )
-                pacman.setRequestedDirection( Utils.findAlternativeWay('long') )
+                pacman.setRequestedDirection( Utils.findAlternativeWay('long', pacman.getCurrentTile() ) )
             if( pacman.direction() == "NORTH" || pacman.direction() == "SOUTH" )
-                pacman.setRequestedDirection( Utils.findAlternativeWay('lat') )
+                pacman.setRequestedDirection( Utils.findAlternativeWay('lat', pacman.getCurrentTile() ) )
         }
     
     }

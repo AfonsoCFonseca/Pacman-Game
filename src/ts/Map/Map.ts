@@ -6,8 +6,11 @@ import { Utils } from '../Utils/utils'
 import { mapSetup1, mapSetup } from './Layouts'
 
 export class Map {
-    public MAP_WIDTH = 19;
-    public MAP_HEIGHT = 21;
+    public MAP_TILE_WIDTH = 19;
+    public MAP_TILE_HEIGHT = 21;
+    public MAP_WIDTH = this.MAP_TILE_WIDTH*50
+    public MAP_HEIGHT = this.MAP_TILE_HEIGHT*50
+    public 
     private TILE_SIZE = 50
     private currentMap: Tile[][] = [[]]
 
@@ -16,9 +19,9 @@ export class Map {
     }
 
     private createMap(): void{
-        for( let y = 0; y < this.MAP_HEIGHT; y++ ){
+        for( let y = 0; y < this.MAP_TILE_HEIGHT; y++ ){
             this.currentMap[y] = []
-            for( let x = 0; x < this.MAP_WIDTH; x++ ){
+            for( let x = 0; x < this.MAP_TILE_WIDTH; x++ ){
 
                 if( mapSetup1[y][x] == 0 ) scene.maxPoints++  
 
