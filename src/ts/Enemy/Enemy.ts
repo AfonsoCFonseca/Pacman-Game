@@ -1,200 +1,220 @@
-import { Position } from '../game-interfaces/position.interface'
-import { GameMode } from '../game-interfaces/modes.interface'
-import { Tile, tileType } from '../Tile'
-import { map, FRIGHTENED_SPEED } from '../app'
-import { directionEnum } from '../game-interfaces/direction.interface'
-import { Utils } from '../Utils/utils'
-import { scene, ENEMY_SPAWN_TIME, CENTER_MAP_POSITION, ENEMY_SETFREE_TIME } from '../app'
-import { tweenMovement } from '../Utils/animations'
+import { Position } from "../game-interfaces/position.interface";
+import { GameMode } from "../game-interfaces/modes.interface";
+import { Tile, tileType } from "../Tile";
+import { map, FRIGHTENED_SPEED } from "../app";
+import { directionEnum } from "../game-interfaces/direction.interface";
+import { Utils } from "../Utils/utils";
+import {
+  scene,
+  ENEMY_SPAWN_TIME,
+  CENTER_MAP_POSITION,
+  ENEMY_SETFREE_TIME,
+} from "../app";
+import { tweenMovement } from "../Utils/animations";
 
 export abstract class Enemy {
-    public SPEED = 3
-    protected isFree: boolean = false
-    protected timeToSetFree: number | null;
-    protected mode: GameMode = GameMode.CHASE
-    public position: Position
-    private destinyTile: Tile 
-    protected ghost
-    public actualDirection: directionEnum = directionEnum.NORTH
-    public requestedDirection: directionEnum
-    protected ghostType: string
-    protected frightenedTile = map.getRandomAvailableTile( "anywhere" )
-    protected initialPosition: Position
+  public SPEED = 3;
+  protected isFree: boolean = false;
+  protected timeToSetFree: number | null;
+  protected mode: GameMode = GameMode.CHASE;
+  public position: Position;
+  private destinyTile: Tile;
+  protected ghost;
+  public actualDirection: directionEnum = directionEnum.NORTH;
+  public requestedDirection: directionEnum;
+  protected ghostType: string;
+  protected frightenedTile = map.getRandomAvailableTile("ANYWHERE");
+  protected initialPosition: Position;
 
-    constructor(position: Position, ghost ){
-        this.ghost = ghost
-        this.mode = GameMode.CHASE
-        this.setPosition(position)
-        this.ghostType = ghost.type
-        this.timeToSetFree = ghost.timeToSetFree
-        this.ghost.anims.play(`ghost${this.ghostType}East`) 
+  constructor(position: Position, ghost) {
+    this.ghost = ghost;
+    this.mode = GameMode.CHASE;
+    this.setPosition(position);
+    this.ghostType = ghost.type;
+    this.timeToSetFree = ghost.timeToSetFree;
+    this.ghost.anims.play(`ghost${this.ghostType}East`);
 
-        this.update = this.update.bind(this);
-        this.setGameMode = this.setGameMode.bind( this )
+    this.update = this.update.bind(this);
+    this.setGameMode = this.setGameMode.bind(this);
 
-        ghost.setData('GhostObject', this);
+    ghost.setData("GhostObject", this);
 
-        scene.events.on('updateEnemy' , this.update )
-        scene.events.on('setGameMode' , this.setGameMode )
+    scene.events.on("updateEnemy", this.update);
+    scene.events.on("setGameMode", this.setGameMode);
+  }
+
+  getPosition(): Position {
+    return this.position;
+  }
+
+  public setEnemyFree(): void {
+    this.isFree = true;
+  }
+
+  protected setPosition({ x, y }: Position): void {
+    this.position = { x, y };
+  }
+
+  getCurrentTile(): Tile {
+    return map.getTile(this.position);
+  }
+
+  protected setDestinyTile(tile: Tile): void {
+    this.destinyTile = tile;
+  }
+
+  getDestinyTile(): Tile {
+    return this.destinyTile;
+  }
+
+  protected setGameMode(mode: GameMode): void {
+    if (this.isFree) {
+      if (mode == GameMode.CHASE) {
+        this.SPEED = Utils.calculateSpeed();
+      } else if (mode == GameMode.FRIGHTENED) {
+        this.SPEED = FRIGHTENED_SPEED;
+      }
+      this.mode = mode;
+    }
+  }
+
+  public update() {
+    this.setPosition(this.ghost);
+
+    if (this.isFree) {
+      this.findRoute();
+      this.actualDirection = Utils.requestMovementInformation(this);
+      this.move();
     }
 
-    getPosition(): Position{
-        return this.position
+    if (scene.time.now > this.timeToSetFree && !this.isFree)
+      this.setEnemyFree();
+  }
+
+  private move() {
+    let animationName: string;
+    switch (this.actualDirection) {
+      case "SOUTH":
+        animationName = "South";
+        this.ghost.y += this.SPEED;
+        break;
+      case "NORTH":
+        animationName = "North";
+        this.ghost.y -= this.SPEED;
+        break;
+      case "WEST":
+        animationName = "West";
+        this.ghost.x -= this.SPEED;
+        break;
+      case "EAST":
+        animationName = "East";
+        this.ghost.x += this.SPEED;
+    }
+    if (this.mode == GameMode.FRIGHTENED) animationName = "frigthenedAnim";
+    else animationName = `ghost${this.ghostType}${animationName}`;
+
+    this.ghost.anims.play(animationName);
+  }
+
+  private findRoute(): directionEnum {
+    if (
+      this.mode == GameMode.FRIGHTENED &&
+      this.getCurrentTile() == this.frightenedTile
+    ) {
+      this.frightenedTile = map.getRandomAvailableTile("ANYWHERE");
+      return;
     }
 
-    public setEnemyFree(): void{
-        this.isFree = true
-    }
+    let position = this.getCurrentTile().getPosition();
+    let destinyTilePosition = this.destinyTile.getPosition();
+    let chosenDirections = this.makePriority(position, destinyTilePosition);
 
-    protected setPosition({ x, y }:Position): void{
-        this.position = { x, y }
-    }
+    for (var i = 0; i < chosenDirections.length; i++) {
+      let futureTile = map.getNeighborTile(
+        this.getCurrentTile(),
+        chosenDirections[i]
+      );
 
-    getCurrentTile():Tile{
-        return map.getTile(this.position)
-    }
-
-    protected setDestinyTile( tile: Tile ): void{
-        this.destinyTile = tile
-    }
-
-    getDestinyTile( ): Tile{
-        return this.destinyTile 
-    }
-
-    protected setGameMode( mode: GameMode ):void{
-
-        if( this.isFree ){
-            if(mode == GameMode.CHASE ){
-                this.SPEED = Utils.calculateSpeed()
-            }
-            else if( mode == GameMode.FRIGHTENED ){
-                this.SPEED = FRIGHTENED_SPEED
-            }
-            this.mode = mode 
-        }
-    }
-
-    public update(){
-        this.setPosition(this.ghost)
-        
-        if( this.isFree ){
-            this.findRoute()
-            this.actualDirection = Utils.requestMovementInformation( this )
-            this.move()  
-        } 
-        
-        if( scene.time.now > this.timeToSetFree && !this.isFree )
-            this.setEnemyFree()
-        
-    }
-
-    private move(){
-        let animationName: string;
-        switch(this.actualDirection) {
-            case "SOUTH":
-                animationName = 'South'
-                this.ghost.y+= this.SPEED
-            break;
-            case "NORTH":
-                animationName = 'North'
-                this.ghost.y-= this.SPEED
-            break;
-            case "WEST":
-                animationName = 'West'
-                this.ghost.x-= this.SPEED
-            break;
-            case "EAST":
-                animationName = 'East'
-                this.ghost.x+= this.SPEED
-        }
-        if( this.mode ==  GameMode.FRIGHTENED ) animationName = 'frigthenedAnim'
-        else animationName = `ghost${this.ghostType}${animationName}`
-
-        this.ghost.anims.play(animationName) 
-    }
-
-    private findRoute(): directionEnum {
-
-        if( this.mode == GameMode.FRIGHTENED && this.getCurrentTile() == this.frightenedTile ){
-            this.frightenedTile = map.getRandomAvailableTile( "anywhere" )
-            return
-        } 
-
-        let position = this.getCurrentTile().getPosition()
-        let destinyTilePosition = this.destinyTile.getPosition() 
-        let chosenDirections = this.makePriority( position, destinyTilePosition)
-        
-        for( var i = 0; i < chosenDirections.length; i++){
-            let futureTile = map.getNeighborTile( this.getCurrentTile(), chosenDirections[i])
-
-            if( futureTile.type !== tileType.WALL &&
-                chosenDirections[i] !== Utils.opositeDirection(this.actualDirection)){
-
-                    if( futureTile.type === tileType.DOOR && this.actualDirection === "NORTH"){
-                            chosenDirections[i] = directionEnum.NORTH
-
-                    }
-
-                this.requestedDirection = chosenDirections[i]
-                break
-
-            }
-           
-        }
-        
-        return this.requestedDirection
-    }
-
-    private makePriority( {x, y}:Position, destinyTilePosition: Position): directionEnum[]{
-        let chosenDirections: directionEnum[] = []
-        let xDistance = x - Math.abs(destinyTilePosition.x)
-        let yDistance = y - Math.abs(destinyTilePosition.y)
-        let mDirArr = [directionEnum.EAST, directionEnum.WEST, directionEnum.NORTH, directionEnum.SOUTH]
-
-        if( xDistance > yDistance){
-            chosenDirections.push( x < destinyTilePosition.x ? directionEnum.EAST: directionEnum.WEST)
-            chosenDirections.push( y < destinyTilePosition.y ? directionEnum.SOUTH: directionEnum.NORTH)
-        }
-        else{
-            chosenDirections.push( y < destinyTilePosition.y ? directionEnum.SOUTH: directionEnum.NORTH)
-            chosenDirections.push( x < destinyTilePosition.x ? directionEnum.EAST: directionEnum.WEST)
+      if (
+        futureTile.type !== tileType.WALL &&
+        chosenDirections[i] !== Utils.opositeDirection(this.actualDirection)
+      ) {
+        if (
+          futureTile.type === tileType.DOOR &&
+          this.actualDirection === "NORTH"
+        ) {
+          chosenDirections[i] = directionEnum.NORTH;
         }
 
-        for( var i = 0; i < chosenDirections.length; i++ ){
-            for( var j = 0; j < mDirArr.length; j++ ){
-
-                if( mDirArr[j] === chosenDirections[i])
-                    mDirArr.splice(j, 1)
-                
-            }
-        }
-
-        mDirArr.forEach( dir => chosenDirections.push( dir ) )
-
-        return chosenDirections
+        this.requestedDirection = chosenDirections[i];
+        break;
+      }
     }
 
-    public sentToCage( enemySprite ){
-        enemySprite.disableBody( false, true )
-        this.timeToSetFree = scene.time.now + ENEMY_SPAWN_TIME
-        this.setGameMode(GameMode.CHASE)
-        this.isFree = false
-        let self = this
+    return this.requestedDirection;
+  }
 
-        let image = scene.add.image( self.position.x,self.position.y, 'frightened')
-        tweenMovement( image, () => {
-            image.destroy()
-            this.ghost.x = CENTER_MAP_POSITION.x
-            this.ghost.y = CENTER_MAP_POSITION.y
-            enemySprite.body.moves = false
-            enemySprite.visible = true
-            this.ghost.anims.play(`ghost${this.ghostType}East`) 
-        })
-        
-        setTimeout(()=>{ 
-            console.log( self.mode)
-            self.isFree = true
-        }, ENEMY_SPAWN_TIME )
+  private makePriority(
+    { x, y }: Position,
+    destinyTilePosition: Position
+  ): directionEnum[] {
+    let chosenDirections: directionEnum[] = [];
+    let xDistance = x - Math.abs(destinyTilePosition.x);
+    let yDistance = y - Math.abs(destinyTilePosition.y);
+    let mDirArr = [
+      directionEnum.EAST,
+      directionEnum.WEST,
+      directionEnum.NORTH,
+      directionEnum.SOUTH,
+    ];
+
+    if (xDistance > yDistance) {
+      chosenDirections.push(
+        x < destinyTilePosition.x ? directionEnum.EAST : directionEnum.WEST
+      );
+      chosenDirections.push(
+        y < destinyTilePosition.y ? directionEnum.SOUTH : directionEnum.NORTH
+      );
+    } else {
+      chosenDirections.push(
+        y < destinyTilePosition.y ? directionEnum.SOUTH : directionEnum.NORTH
+      );
+      chosenDirections.push(
+        x < destinyTilePosition.x ? directionEnum.EAST : directionEnum.WEST
+      );
     }
+
+    for (var i = 0; i < chosenDirections.length; i++) {
+      for (var j = 0; j < mDirArr.length; j++) {
+        if (mDirArr[j] === chosenDirections[i]) mDirArr.splice(j, 1);
+      }
+    }
+
+    mDirArr.forEach((dir) => chosenDirections.push(dir));
+
+    return chosenDirections;
+  }
+
+  public sentToCage(enemySprite) {
+    enemySprite.disableBody(false, true);
+    this.timeToSetFree = scene.time.now + ENEMY_SPAWN_TIME;
+    this.setGameMode(GameMode.CHASE);
+    this.isFree = false;
+    let self = this;
+
+    let image = scene.add.image(self.position.x, self.position.y, "frightened");
+    tweenMovement(image, () => {
+      image.destroy();
+      this.ghost.x = CENTER_MAP_POSITION.x;
+      this.ghost.y = CENTER_MAP_POSITION.y;
+      enemySprite.body.moves = false;
+      enemySprite.visible = true;
+      this.ghost.anims.play(`ghost${this.ghostType}East`);
+    });
+
+    setTimeout(() => {
+      console.log(self.mode);
+      self.isFree = true;
+    }, ENEMY_SPAWN_TIME);
+  }
 }
