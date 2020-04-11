@@ -3,7 +3,7 @@ import { Enemy } from './Enemy'
 import { Tile,tileType } from '../Tile';
 import { map, pacman } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
-import { scene } from '../app'
+import { scene,ENEMY_SETFREE_TIME } from '../app'
 import { Utils } from '../Utils/utils'
 
 export class PinkGhost extends Enemy {
@@ -12,9 +12,10 @@ export class PinkGhost extends Enemy {
         let position = {x: 475, y: 475 }
         let ghost = scene.physics.add.sprite( position.x, position.y,"ghosts" )
         ghost.type = "Pink"
-        ghost.timeToSetFree = 16000
+        ghost.timeToSetFree = ENEMY_SETFREE_TIME * 3
         scene.enemyGroup.add(ghost);
         super( position, ghost )
+        this.initialPosition = position
 
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )

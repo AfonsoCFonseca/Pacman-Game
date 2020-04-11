@@ -1,4 +1,4 @@
-import { map, scene } from '../app'
+import { map, scene, level, SPEED } from '../app'
 import { tileType, Tile } from '../Tile'
 import { directionEnum } from '../game-interfaces/direction.interface'
 
@@ -136,5 +136,9 @@ export class Utils {
             console.log( y )
         }
 
+    }
+
+    public static calculateSpeed():number{
+        return SPEED * level 
     }
 }

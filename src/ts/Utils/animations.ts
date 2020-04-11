@@ -1,4 +1,4 @@
-import { scene } from '../app'
+import { scene, CENTER_MAP_POSITION } from '../app'
 
 export function pacmanAnimInit( ){
 
@@ -40,7 +40,7 @@ export function ghostsAnimInit( ){
         'ghostOrangeNorth',
         'ghostOrangeSouth',
         'ghostOrangeWest',
-
+        'frigthenedAnim',
     ]
     for( var i = 0; i < namesArray.length; i++ ){   
         scene.anims.create({
@@ -48,4 +48,20 @@ export function ghostsAnimInit( ){
             key: namesArray[i],
         })
     }
+}
+
+export function tweenMovement(target, callback ){
+
+    var tween = scene.tweens.add({
+        targets: target,
+        x: CENTER_MAP_POSITION.x,       
+        y: CENTER_MAP_POSITION.y,
+        ease: 'Linear',     
+        duration: 1000,
+        repeat: 0,           
+        onComplete: function () {
+            callback()
+        },
+    });  
+
 }

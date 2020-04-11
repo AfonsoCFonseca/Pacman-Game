@@ -8,8 +8,9 @@ import { BlueGhost } from './Enemy/BlueGhost'
 import { PinkGhost } from './Enemy/PinkGhost'
 import { OrangeGhost } from './Enemy/OrangeGhost'
 import { Enemy } from "./Enemy/Enemy"
-import { pacmanAnimInit, ghostsAnimInit } from "./Utils/animations"
+import { pacmanAnimInit, ghostsAnimInit,tweenMovement } from "./Utils/animations"
 import { Utils} from "./Utils/utils"
+import { Game } from "phaser"
 
 export let scene
 export let map: Map
@@ -20,18 +21,26 @@ export let redGhost: Enemy
 let pinkGhost: Enemy
 let blueGhost: Enemy
 let orangeGhost: Enemy
+export let level = 1
 
-const POWER_UP_TIME = 5000
+export const SPEED = 3
 
-// let nextTileGUI
-// let currentTileGUI
+export const FRIGHTENED_TIME = 7000
+export const FRIGHTENED_SPEED = 2
+let frigthenedTimer = null
+
+export const ENEMY_SPAWN_TIME = 4000
+export const ENEMY_SETFREE_TIME = 5000
+
+export const CENTER_MAP_POSITION = {x: 475, y: 475 }
 let pointGUI
 
 export class GameScene extends Phaser.Scene {
     imageGroup: Phaser.GameObjects.Group
     pointsGroup: Phaser.Physics.Arcade.StaticGroup
+    
     powerUpGroup: Phaser.Physics.Arcade.StaticGroup
-    enemyGroup: Phaser.GameObjects.Group
+    enemyGroup
 
     points = 0; 
     maxPoints: number
@@ -39,6 +48,7 @@ export class GameScene extends Phaser.Scene {
 
     constructor(){
         super({})
+        this.enemyCollide = this.enemyCollide.bind( this )
     }
 
     preload(){
@@ -50,11 +60,12 @@ export class GameScene extends Phaser.Scene {
         this.load.image( 'logo', 'assets/Pac-Man_title.png' )
         this.load.image( 'door', 'assets/doorTile.png' )
         this.load.image( 'blueDot', 'assets/blueDot.png' )
+        this.load.image( 'frightened', 'assets/frightened.png' )
 
         this.imageGroup = this.add.group();
         this.pointsGroup = this.physics.add.staticGroup();
         this.powerUpGroup = this.physics.add.staticGroup();
-        this.enemyGroup = this.add.group()
+        this.enemyGroup =  this.add.group()
         
         scene = this
 
@@ -76,9 +87,11 @@ export class GameScene extends Phaser.Scene {
         pinkGhost = new PinkGhost()
         blueGhost = new BlueGhost()
         orangeGhost = new OrangeGhost()
+        this.enemyGroup.enableBody = true;
 
-        this.physics.add.overlap( player, this.pointsGroup, this.collectPoint, null, this )
+        this.physics.add.overlap( player, this.pointsGroup, this.collectPoint)
         this.physics.add.overlap( player, this.powerUpGroup, this.collectPowerUp, null, this )
+        this.physics.add.collider( player, this.enemyGroup, this.enemyCollide )
 
     }
 
@@ -122,10 +135,21 @@ export class GameScene extends Phaser.Scene {
     collectPowerUp( player, powerUp ){
         this.events.emit('setGameMode', GameMode.FRIGHTENED );
         powerUp.disableBody( true, true )
-
-        setTimeout(() => {
+        
+        if( frigthenedTimer ) clearTimeout(frigthenedTimer); 
+        frigthenedTimer = setTimeout(() => {
             this.events.emit('setGameMode', GameMode.CHASE );
-        }, POWER_UP_TIME )
+        }, FRIGHTENED_TIME )
+    }
+
+    enemyCollide( player, enemy ){
+        let enemyObj = enemy.getData('GhostObject')
+        if( enemyObj.mode == GameMode.FRIGHTENED ){
+            enemyObj.sentToCage(enemy)
+        }
+        else {
+            this.GameOver()
+        }
     }
     
     keys(){
@@ -142,7 +166,12 @@ export class GameScene extends Phaser.Scene {
     }
 
     nextLevel(){
+        level++
         console.log( "Next Level")
+    }
+
+    GameOver(){
+        console.log("GAMEOVER")
     }
 
 

@@ -1,16 +1,17 @@
 import { Position } from '../game-interfaces/position.interface'
 import { GameMode } from '../game-interfaces/modes.interface'
 import { Tile, tileType } from '../Tile'
-import { map } from '../app'
+import { map, FRIGHTENED_SPEED } from '../app'
 import { directionEnum } from '../game-interfaces/direction.interface'
 import { Utils } from '../Utils/utils'
-import { scene } from '../app'
+import { scene, ENEMY_SPAWN_TIME, CENTER_MAP_POSITION, ENEMY_SETFREE_TIME } from '../app'
+import { tweenMovement } from '../Utils/animations'
 
 export abstract class Enemy {
     public SPEED = 3
     protected isFree: boolean = false
     protected timeToSetFree: number | null;
-    protected mode: GameMode
+    protected mode: GameMode = GameMode.CHASE
     public position: Position
     private destinyTile: Tile 
     protected ghost
@@ -18,6 +19,7 @@ export abstract class Enemy {
     public requestedDirection: directionEnum
     protected ghostType: string
     protected frightenedTile = map.getRandomAvailableTile( "anywhere" )
+    protected initialPosition: Position
 
     constructor(position: Position, ghost ){
         this.ghost = ghost
@@ -29,6 +31,8 @@ export abstract class Enemy {
 
         this.update = this.update.bind(this);
         this.setGameMode = this.setGameMode.bind( this )
+
+        ghost.setData('GhostObject', this);
 
         scene.events.on('updateEnemy' , this.update )
         scene.events.on('setGameMode' , this.setGameMode )
@@ -59,7 +63,16 @@ export abstract class Enemy {
     }
 
     protected setGameMode( mode: GameMode ):void{
-        this.mode = mode
+
+        if( this.isFree ){
+            if(mode == GameMode.CHASE ){
+                this.SPEED = Utils.calculateSpeed()
+            }
+            else if( mode == GameMode.FRIGHTENED ){
+                this.SPEED = FRIGHTENED_SPEED
+            }
+            this.mode = mode 
+        }
     }
 
     public update(){
@@ -77,24 +90,28 @@ export abstract class Enemy {
     }
 
     private move(){
+        let animationName: string;
         switch(this.actualDirection) {
             case "SOUTH":
-                this.ghost.anims.play(`ghost${this.ghostType}South`) 
+                animationName = 'South'
                 this.ghost.y+= this.SPEED
             break;
             case "NORTH":
-                this.ghost.anims.play(`ghost${this.ghostType}North`) 
+                animationName = 'North'
                 this.ghost.y-= this.SPEED
             break;
             case "WEST":
-                this.ghost.anims.play(`ghost${this.ghostType}West`) 
+                animationName = 'West'
                 this.ghost.x-= this.SPEED
             break;
             case "EAST":
-                this.ghost.anims.play(`ghost${this.ghostType}East`) 
+                animationName = 'East'
                 this.ghost.x+= this.SPEED
         }
+        if( this.mode ==  GameMode.FRIGHTENED ) animationName = 'frigthenedAnim'
+        else animationName = `ghost${this.ghostType}${animationName}`
 
+        this.ghost.anims.play(animationName) 
     }
 
     private findRoute(): directionEnum {
@@ -124,9 +141,6 @@ export abstract class Enemy {
 
             }
            
-            // if( futureTile.type === tileType.DOOR && this.actualDirection === "NORTH"){
-            //     chosenDirections[i] = directionEnum.NORTH
-            // }
         }
         
         return this.requestedDirection
@@ -161,4 +175,26 @@ export abstract class Enemy {
         return chosenDirections
     }
 
+    public sentToCage( enemySprite ){
+        enemySprite.disableBody( false, true )
+        this.timeToSetFree = scene.time.now + ENEMY_SPAWN_TIME
+        this.setGameMode(GameMode.CHASE)
+        this.isFree = false
+        let self = this
+
+        let image = scene.add.image( self.position.x,self.position.y, 'frightened')
+        tweenMovement( image, () => {
+            image.destroy()
+            this.ghost.x = CENTER_MAP_POSITION.x
+            this.ghost.y = CENTER_MAP_POSITION.y
+            enemySprite.body.moves = false
+            enemySprite.visible = true
+            this.ghost.anims.play(`ghost${this.ghostType}East`) 
+        })
+        
+        setTimeout(()=>{ 
+            console.log( self.mode)
+            self.isFree = true
+        }, ENEMY_SPAWN_TIME )
+    }
 }

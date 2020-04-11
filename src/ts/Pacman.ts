@@ -11,7 +11,7 @@ export class Pacman {
     public actualDirection = directionEnum.EAST
     private nextTile: Tile
     public requestedDirection: directionEnum = directionEnum.EAST
-    public SPEED = 3
+    public SPEED = Utils.calculateSpeed()
 
     constructor( player ){
         this.player = player

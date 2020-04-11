@@ -14,6 +14,7 @@ export class RedGhost extends Enemy {
         ghost.timeToSetFree = null
         scene.enemyGroup.add(ghost);
         super( position, ghost )
+        this.initialPosition = position
         this.setEnemyFree()
 
         let newTile = this.findDestinyTile()
