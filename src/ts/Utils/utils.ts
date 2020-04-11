@@ -153,18 +153,5 @@ export class Utils {
     return SPEED * level;
   }
 
-  public static indexForRandomFruit(): number {
-    let rnd = Math.floor(Math.random() * 10) + 1;
-    let index: number;
-    switch (level) {
-      case 1:
-        return rnd % 2 == 0 ? 0 : 1;
-      case 2:
-        return rnd % 2 == 0 ? 2 : 3;
-      case 3:
-        return rnd % 2 == 0 ? 4 : 5;
-      case 4:
-        return rnd % 2 == 0 ? 6 : 7;
-    }
-  }
+
 }

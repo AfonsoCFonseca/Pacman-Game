@@ -3,6 +3,7 @@ import { Pacman } from "./Pacman";
 import { Map } from "./Map/Map";
 import { directionEnum } from "./game-interfaces/direction.interface";
 import { GameMode } from "./game-interfaces/modes.interface";
+import { Position } from "./game-interfaces/position.interface";
 import { RedGhost } from "./Enemy/RedGhost";
 import { BlueGhost } from "./Enemy/BlueGhost";
 import { PinkGhost } from "./Enemy/PinkGhost";
@@ -16,6 +17,7 @@ import {
 import { Utils } from "./Utils/utils";
 import { Game } from "phaser";
 import { Fruit } from "./Fruit";
+import { tileType, Tile } from "./Tile";
 
 export let scene;
 export let map: Map;
@@ -26,10 +28,10 @@ export let redGhost: Enemy;
 let pinkGhost: Enemy;
 let blueGhost: Enemy;
 let orangeGhost: Enemy;
+
 export let level = 1;
-
 export const SPEED = 3;
-
+export let points = 0;
 export const FRIGHTENED_TIME = 7000;
 export const FRIGHTENED_SPEED = 2;
 let frigthenedTimer = null;
@@ -37,23 +39,32 @@ let frigthenedTimer = null;
 export const ENEMY_SPAWN_TIME = 4000;
 export const ENEMY_SETFREE_TIME = 5000;
 
+const FRUIT_SPAWN_TIMER = 3000 //20000
+const FRUIT_TIME = 10000
+let isFruitSpawned =false
+let fruitTile:Tile
+let previousTileValue: number
+
 export const CENTER_MAP_POSITION = { x: 475, y: 475 };
 let pointGUI;
 
 export class GameScene extends Phaser.Scene {
   imageGroup: Phaser.GameObjects.Group;
   pointsGroup: Phaser.Physics.Arcade.StaticGroup;
-
   powerUpGroup: Phaser.Physics.Arcade.StaticGroup;
+  fruitGroup: Phaser.Physics.Arcade.StaticGroup;
   enemyGroup;
+  maxDots = 0;
+  dots = 0;
 
-  points = 0;
-  maxPoints: number;
   logoImage;
 
   constructor() {
     super({});
     this.enemyCollide = this.enemyCollide.bind(this);
+    this.fruitSpawner = this.fruitSpawner.bind(this);
+    this.collectPowerUp = this.collectPowerUp.bind(this);
+    this.collectPoint = this.collectPoint.bind(this);
   }
 
   preload() {
@@ -80,6 +91,7 @@ export class GameScene extends Phaser.Scene {
     this.imageGroup = this.add.group();
     this.pointsGroup = this.physics.add.staticGroup();
     this.powerUpGroup = this.physics.add.staticGroup();
+    this.fruitGroup = this.physics.add.staticGroup();
     this.enemyGroup = this.add.group();
 
     scene = this;
@@ -105,12 +117,10 @@ export class GameScene extends Phaser.Scene {
     blueGhost = new BlueGhost();
     orangeGhost = new OrangeGhost();
     this.enemyGroup.enableBody = true;
-    console.log(map.getRandomAvailableTile("ANYWHERE"));
-    let pos = map.getRandomAvailableTile("ANYWHERE").getPosition();
-    let fruit = new Fruit({ x: pos.x * 50, y: pos.y * 50 });
 
     this.physics.add.overlap(player, this.pointsGroup, this.collectPoint);
     this.physics.add.collider(player, this.enemyGroup, this.enemyCollide);
+    this.physics.add.overlap(player, this.fruitGroup, this.fruitCollide, null, this );
     this.physics.add.overlap(
       player,
       this.powerUpGroup,
@@ -118,6 +128,8 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
+
+    this.fruitSpawner()
   }
 
   update() {
@@ -145,18 +157,50 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  fruitSpawner(){
+    let self = this
+
+    if(!isFruitSpawned){
+
+      setTimeout(() =>{
+        fruitTile = map.getRandomAvailableTile("ANYWHERE")
+        previousTileValue = fruitTile.getTileValue()
+
+        fruitTile.setTileValue(5)
+        isFruitSpawned = true
+        self.fruitSpawner()
+
+      }, FRUIT_SPAWN_TIMER )
+
+    }
+    else{
+
+      setTimeout(() =>{
+        fruitTile.setTileValue(2)
+        isFruitSpawned = false
+        if( fruitTile.fruit ) fruitTile.fruit.destroy()
+        
+        self.fruitSpawner()
+
+      }, FRUIT_TIME )
+
+    }
+  }
+
   collectPoint(player, point) {
+    points += 10
     let pointOb = point.getData("TileObject");
     pointOb.setTileValue(2);
-    this.points++;
+    this.dots++;
     point.disableBody(true, true);
 
-    if (this.points >= this.maxPoints) {
+    if (this.dots >= this.maxDots) {
       this.nextLevel();
     }
   }
 
   collectPowerUp(player, powerUp) {
+    points += 20
     this.events.emit("setGameMode", GameMode.FRIGHTENED);
     powerUp.disableBody(true, true);
 
@@ -164,6 +208,11 @@ export class GameScene extends Phaser.Scene {
     frigthenedTimer = setTimeout(() => {
       this.events.emit("setGameMode", GameMode.CHASE);
     }, FRIGHTENED_TIME);
+  }
+
+  fruitCollide( player, fruit ){
+    points += fruit.getPoints()
+    fruit.destroy()  
   }
 
   enemyCollide(player, enemy) {
@@ -191,11 +240,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   GameOver() {
-    console.log("GAMEOVER");
+    // console.log("GAMEOVER");
   }
 
   drawGui() {
-    let pointsText = `Points: ${this.points}`;
+    let pointsText = `Points: ${points}`;
     pointGUI.setText(pointsText);
   }
 }

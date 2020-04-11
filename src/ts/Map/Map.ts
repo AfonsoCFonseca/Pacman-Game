@@ -3,7 +3,7 @@ import { Position } from "../game-interfaces/position.interface";
 import { directionEnum } from "../game-interfaces/direction.interface";
 import { scene } from "../app";
 import { Utils } from "../Utils/utils";
-import { mapSetup1, mapSetup } from "./Layouts";
+import { mapSetup1 } from "./Layouts";
 
 export class Map {
   public MAP_TILE_WIDTH = 19;
@@ -22,7 +22,9 @@ export class Map {
     for (let y = 0; y < this.MAP_TILE_HEIGHT; y++) {
       this.currentMap[y] = [];
       for (let x = 0; x < this.MAP_TILE_WIDTH; x++) {
-        if (mapSetup1[y][x] == 0) scene.maxPoints++;
+        if (mapSetup1[y][x] == 0) {
+          scene.maxDots++;
+        }
 
         let tile = new Tile(x, y, mapSetup1[y][x]);
         this.currentMap[y][x] = tile;
@@ -74,7 +76,7 @@ export class Map {
         Math.floor(Math.random() * (+limits.maxY - +limits.minY)) +
         +limits.minY;
       destinyTile = this.currentMap[randomY][randomX];
-    } while (destinyTile.type == "WALL" || destinyTile.type == "DOOR");
+    } while (destinyTile.type == "WALL" || destinyTile.type == "DOOR" || destinyTile.type == "POWER_UP");
 
     return destinyTile;
   }
