@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack & node index",
-    "start": "node index",
+    "start": "node index.js",
+    "build": "webpack",
     "dev": "webpack --watch & live-server --port=8085"
   },
   "author": "",
