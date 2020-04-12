@@ -8,7 +8,7 @@
     "build": "webpack",
     "dev": "webpack --watch & live-server --port=8085"
   },
-  "author": "",
+  "author": "Afonso C Fonseca",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1"
