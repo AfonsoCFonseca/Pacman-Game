@@ -45,10 +45,13 @@ This choice is made depending on where the x and y of the destined Tile is and i
 
 There are 3 types of Modes in-game, Chase mode, Scatter, and Frightened. These modes are dictated by the Enemy and Pacman. Chase mode is the default one where the ghost will chase Pacman, for x to x time, they'll change to scatter mode, where each ghost will position themselves on each corner of the screen for a limited time and finally there's Frightened mode, triggered when Pacman gets the power-up, where the ghosts flee from Pacman for limited time
 
+Created a simple Fruit class for managing the different type of fruits and their spawn points in available areas of the map. The Fruit spawning works with 2 different timers, the time until spawns of the Fruit, and the duration of the Fruit in map. If the players catch it before the timer runs outs, the timer will keep the same previous rules. For each level I randomize 2 types of fruits, increasing their score points, in each level, with a total of 4 levels and 8 fruits.
+
 ---------------------------------------------------------------
 # Scratches & Evolution
 
 <p float="left">
   <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
   <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
+  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/11-04.png'>
 </p>
