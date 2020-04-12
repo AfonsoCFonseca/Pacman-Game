@@ -14,5 +14,5 @@ app.get('/', function(req,res){
 
 app.listen(port, function(){
 	console.log(__dirname);
-	console.log('Simple Server Running on port 8080')
+	console.log('Paman Server Running on port 8080')
 })

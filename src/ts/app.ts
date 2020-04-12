@@ -88,6 +88,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("blueDot", "assets/blueDot.png");
     this.load.image("frightened", "assets/frightened.png");
 
+
     this.imageGroup = this.add.group();
     this.pointsGroup = this.physics.add.staticGroup();
     this.powerUpGroup = this.physics.add.staticGroup();

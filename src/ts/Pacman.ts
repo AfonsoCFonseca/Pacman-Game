@@ -28,9 +28,13 @@ export class Pacman {
         return this.position
     }
 
+    public changeCurrentPosition({x,y}:Position ){
+        this.player.body.x = x
+        this.player.body.y = y
+    }
+
     public getCurrentTile( ):Tile{
-        let tile = map.getTile( this.position )
-        return tile
+        return map.getTile( this.position )
     }
 
     public getNextTile(): Tile{
@@ -53,7 +57,7 @@ export class Pacman {
         this.nextTile = map.getNeighborTile( this.getCurrentTile(), this.requestedDirection)
     }
 
-    setCurrentPosition({ x, y }: Position){
+    public setCurrentPosition({ x, y }: Position){
         this.position = {x, y}
     }
 

@@ -8,7 +8,7 @@ import { Utils } from '../Utils/utils';
 
 export class OrangeGhost extends Enemy {
     tileFarPosition:Tile
-    chaseState: 'far' | 'close'
+    chaseState: 'far' | 'close' 
 
     constructor( ){
         let position = {x: 425, y: 475 }
@@ -18,6 +18,7 @@ export class OrangeGhost extends Enemy {
         scene.enemyGroup.add(ghost);
         super( position, ghost)
         this.initialPosition = position
+        this.chaseState = 'far'
 
         this.tileFarPosition = map.getTile({x:75,y:900})
         let newTile = this.findDestinyTile()
@@ -50,10 +51,12 @@ export class OrangeGhost extends Enemy {
         let ghostPosition = this.getPosition()
         let dist = Utils.distance( pacmanPosition.x, pacmanPosition.y, ghostPosition.x, ghostPosition.y )
 
-        if( dist < 150 )
+        if( dist < 150 && this.chaseState == 'close')
             this.chaseState = 'far'
-        else if( this.getCurrentTile() == this.tileFarPosition )
+        else if( this.getCurrentTile() == this.tileFarPosition && this.chaseState == 'far'){
+            console.log("close")
             this.chaseState = 'close'
+        }
 
         return this.chaseState == 'far' ?  this.tileFarPosition : map.getTile( pacman.getCurrentPosition() )  
 

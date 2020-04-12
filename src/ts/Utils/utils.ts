@@ -3,41 +3,42 @@ import { tileType, Tile } from "../Tile";
 import { directionEnum } from "../game-interfaces/direction.interface";
 
 export class Utils {
-  public static requestMovementInformation({
-    position,
-    actualDirection,
-    requestedDirection,
-    SPEED,
-  }): directionEnum {
-    let { x, y } = position;
+  public static requestMovementInformation(elem): directionEnum {
+    let { x, y } = elem.position;
     let neighborTile = map.getNeighborTile(
-      map.getTile(position),
-      requestedDirection
+      map.getTile(elem.position),
+      elem.requestedDirection
     );
 
+    if ( neighborTile.type === tileType.TELEPORT  ) {
+      let {x,y} = this.convertTilePosToXY( neighborTile.opositeTeleportPosition)
+      elem.changeCurrentPosition({x,y})
+      return elem.actualDirection
+    }
+    
     if (
       neighborTile.type === tileType.WALL ||
-      (neighborTile.type === tileType.DOOR && requestedDirection != "NORTH")
-    )
-      return actualDirection;
+      (neighborTile.type === tileType.DOOR && elem.requestedDirection != "NORTH")
+    ) return elem.actualDirection;
+    
 
     for (var i = 0; i < SPEED; i++) {
       if (
-        (actualDirection == "SOUTH" &&
+        (elem.actualDirection == "SOUTH" &&
           (y + i) % 25 === 0 &&
           (y + i) % 2 !== 0) ||
-        (actualDirection == "NORTH" &&
+        (elem.actualDirection == "NORTH" &&
           (y - i) % 25 === 0 &&
           (y - i) % 2 !== 0) ||
-        (actualDirection == "WEST" &&
+        (elem.actualDirection == "WEST" &&
           (x - i) % 25 === 0 &&
           (x - i) % 2 !== 0) ||
-        (actualDirection == "EAST" && (x + i) % 25 === 0 && (x + i) % 2 !== 0)
+        (elem.actualDirection == "EAST" && (x + i) % 25 === 0 && (x + i) % 2 !== 0)
       )
-        return requestedDirection;
+        return elem.requestedDirection;
     }
 
-    return actualDirection;
+    return elem.actualDirection;
   }
 
   public static opositeDirection(dir: directionEnum): directionEnum {
@@ -139,9 +140,9 @@ export class Utils {
   }
 
   public static targetDrawer(target: Tile, verbose: boolean = false) {
-    let { x, y } = target.getPosition();
+    let { x, y } = this.convertTilePosToXY ( target.getPosition() )
 
-    scene.add.image(x * 50 + 18, y * 50 + 18, "blueDot").setOrigin(0, 0);
+    scene.add.image(x + 18, y + 18, "blueDot").setOrigin(0, 0);
 
     if (verbose) {
       console.log(x);
@@ -151,6 +152,10 @@ export class Utils {
 
   public static calculateSpeed(): number {
     return SPEED * level;
+  }
+
+  public static convertTilePosToXY({x,y}){
+    return {x: (x*50), y: (y*50)}
   }
 
 

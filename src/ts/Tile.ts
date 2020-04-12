@@ -1,6 +1,7 @@
 import { Position } from './game-interfaces/position.interface' 
 import { scene } from './app'
 import { Fruit } from './Fruit'
+import { Utils } from './Utils/utils'
 
 export enum tileType {
     EMPTY = "EMPTY",
@@ -22,6 +23,8 @@ export class Tile {
     private position: Position;
     public _id: string;
     public fruit: Fruit | null
+    public opositeTeleportPosition: Position | null
+
 
     constructor( x, y, value ){
         this._id = `tile_${x}_${y}`
@@ -84,12 +87,19 @@ export class Tile {
                   "door" ).setOrigin(0,0)
             scene.imageGroup.add(door);
         }
-        else if( value == 5 ){
+        else if( value == 5 ){ 
             if( this.value == 1 ) scene.dots++
             this.type = tileType.FRUIT
-            let pos = this.getPosition();
-            let fruit = new Fruit({ x: pos.x * 50, y: pos.y * 50 });
+            let {x,y} = Utils.convertTilePosToXY( this.getPosition() )
+            let fruit = new Fruit({ x, y });
             this.fruit = fruit
+        }
+        else if( value == 6 ){
+            this.type = tileType.TELEPORT
+
+            if( this.position.x == 18 )
+                this.opositeTeleportPosition = {x: 0, y: 9}
+            else this.opositeTeleportPosition = {x: 18, y: 9}
         }
 
         this.value = value

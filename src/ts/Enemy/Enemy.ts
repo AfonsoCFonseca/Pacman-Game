@@ -47,6 +47,11 @@ export abstract class Enemy {
     return this.position;
   }
 
+  public changeCurrentPosition({x,y}: Position){
+    this.ghost.body.x = x
+    this.ghost.body.y = y
+  }
+
   public setEnemyFree(): void {
     this.isFree = true;
   }
@@ -55,7 +60,7 @@ export abstract class Enemy {
     this.position = { x, y };
   }
 
-  getCurrentTile(): Tile {
+  public getCurrentTile(): Tile {
     return map.getTile(this.position);
   }
 
@@ -207,13 +212,14 @@ export abstract class Enemy {
       image.destroy();
       this.ghost.x = CENTER_MAP_POSITION.x;
       this.ghost.y = CENTER_MAP_POSITION.y;
-      enemySprite.body.moves = false;
+      enemySprite.body.moves = true;
       enemySprite.visible = true;
       this.ghost.anims.play(`ghost${this.ghostType}East`);
     });
 
     setTimeout(() => {
       console.log(self.mode);
+      enemySprite.enableBody();
       self.isFree = true;
     }, ENEMY_SPAWN_TIME);
   }
