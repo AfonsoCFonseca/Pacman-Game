@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack node index",
+    "build": "webpack & node index",
     "start": "node index",
     "dev": "webpack --watch & live-server --port=8085"
   },
