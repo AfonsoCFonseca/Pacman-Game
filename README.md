@@ -53,5 +53,5 @@ This choice is made depending on where the x and y of the destined Tile is and i
   <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
   <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
   <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/11-04.png' >
-  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/IMG_5625.jpg' >
+  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/IMG_56251.jpg' >
 </p>
