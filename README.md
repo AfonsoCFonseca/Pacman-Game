@@ -21,7 +21,8 @@ The main class of the player, responsible for the movement of Pacman, the animat
 ### Enemy ###
 An abstract class that represents the basics of the enemy, movement, enum modes ( scatter, frightened or chase ).
 This class will be used by the derived class, depending on the type of the enemy:
-- Red Ghost
+
+**Red Ghost**
   The red ghost is the more aggressive of the group of enemies, he simply tracks the Tile where the player is located at.
   
 **Pink Ghost**
