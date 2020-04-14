@@ -3,6 +3,8 @@ import { scene } from './app'
 import { Fruit } from './Fruit'
 import { Utils } from './Utils/utils'
 
+export let fruit: Fruit
+
 export enum tileType {
     EMPTY = "EMPTY",
     POINT = "POINT",
@@ -91,7 +93,7 @@ export class Tile {
             if( this.value == 1 ) scene.dots++
             this.type = tileType.FRUIT
             let {x,y} = Utils.convertTilePosToXY( this.getPosition() )
-            let fruit = new Fruit({ x, y });
+            fruit = new Fruit({ x, y });
             this.fruit = fruit
         }
         else if( value == 6 ){

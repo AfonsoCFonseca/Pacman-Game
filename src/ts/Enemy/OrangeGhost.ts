@@ -14,7 +14,7 @@ export class OrangeGhost extends Enemy {
         let position = {x: 425, y: 475 }
         let ghost = scene.physics.add.sprite( position.x, position.y,"ghosts" )
         ghost.type = "Orange"
-        ghost.timeToSetFree = ENEMY_SETFREE_TIME * 2
+        ghost.timeToSetFree = ENEMY_SETFREE_TIME * 2.5
         scene.enemyGroup.add(ghost);
         super( position, ghost)
         this.initialPosition = position

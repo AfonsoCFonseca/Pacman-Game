@@ -1,24 +1,22 @@
 import { Position } from '../game-interfaces/position.interface'
 import { Enemy } from './Enemy'
 import { Tile } from '../Tile';
-import { map, pacman } from '../app'
+import { map, pacman, ENEMY_SPAWN_TIME } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
 import { scene } from '../app'
 
 export class RedGhost extends Enemy {
-
     constructor( ){
         let position = { x: 475, y: 375 }
         let ghost = scene.physics.add.sprite( position.x, position.y,"ghostRedAnim" )
         ghost.type = "Red"
-        ghost.timeToSetFree = null
+        ghost.timeToSetFree = ENEMY_SPAWN_TIME
         scene.enemyGroup.add(ghost);
         super( position, ghost )
         this.initialPosition = position
-        this.setEnemyFree()
 
-        let newTile = this.findDestinyTile()
-        this.setDestinyTile( newTile )
+        // let newTile = this.findDestinyTile()
+        // this.setDestinyTile( newTile )
 
     }
 
@@ -41,13 +39,8 @@ export class RedGhost extends Enemy {
         }
     }
 
-    private chase(){
-
-    }
-
     private scatter(){
         console.log( "scatter" )
     }
-
     
 }

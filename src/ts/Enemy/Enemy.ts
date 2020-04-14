@@ -1,7 +1,7 @@
 import { Position } from "../game-interfaces/position.interface";
 import { GameMode } from "../game-interfaces/modes.interface";
 import { Tile, tileType } from "../Tile";
-import { map, FRIGHTENED_SPEED } from "../app";
+import { map } from "../app";
 import { directionEnum } from "../game-interfaces/direction.interface";
 import { Utils } from "../Utils/utils";
 import {
@@ -14,12 +14,12 @@ import { tweenMovement } from "../Utils/animations";
 
 export abstract class Enemy {
   public SPEED = 3;
-  protected isFree: boolean = false;
+  public isFree: boolean = false;
   protected timeToSetFree: number | null;
   protected mode: GameMode = GameMode.CHASE;
   public position: Position;
   private destinyTile: Tile;
-  protected ghost;
+  public ghost;
   public actualDirection: directionEnum = directionEnum.NORTH;
   public requestedDirection: directionEnum;
   protected ghostType: string;
@@ -33,6 +33,8 @@ export abstract class Enemy {
     this.ghostType = ghost.type;
     this.timeToSetFree = ghost.timeToSetFree;
     this.ghost.anims.play(`ghost${this.ghostType}East`);
+    this.ghost.setDepth(1);
+
 
     this.update = this.update.bind(this);
     this.setGameMode = this.setGameMode.bind(this);
@@ -77,7 +79,7 @@ export abstract class Enemy {
       if (mode == GameMode.CHASE) {
         this.SPEED = Utils.calculateSpeed();
       } else if (mode == GameMode.FRIGHTENED) {
-        this.SPEED = FRIGHTENED_SPEED;
+        this.SPEED = this.SPEED / 2;
       }
       this.mode = mode;
     }
@@ -92,8 +94,14 @@ export abstract class Enemy {
       this.move();
     }
 
-    if (scene.time.now > this.timeToSetFree && !this.isFree)
+    if (scene.time.now > this.timeToSetFree && !this.isFree){
       this.setEnemyFree();
+    }
+  }
+  
+  public freeze(){
+    this.timeToSetFree = 999999
+    this.isFree = false
   }
 
   private move() {
@@ -218,9 +226,18 @@ export abstract class Enemy {
     });
 
     setTimeout(() => {
-      console.log(self.mode);
       enemySprite.enableBody();
       self.isFree = true;
     }, ENEMY_SPAWN_TIME);
   }
+
+  public prepareNextLevel(){
+    this.SPEED = Utils.calculateSpeed()
+    this.ghost.anims.play(`ghost${this.ghostType}East`);
+    this.setGameMode(GameMode.CHASE);
+    this.timeToSetFree = scene.time.now + this.ghost.timeToSetFree;
+    this.ghost.x = this.initialPosition.x
+    this.ghost.y = this.initialPosition.y
+  }
+
 }

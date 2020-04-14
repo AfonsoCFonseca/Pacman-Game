@@ -13,7 +13,7 @@ export class BlueGhost extends Enemy {
         let ghost = scene.physics.add.sprite( position.x, position.y,"ghosts" )
 
         ghost.type = "Blue"
-        ghost.timeToSetFree = ENEMY_SETFREE_TIME
+        ghost.timeToSetFree = ENEMY_SETFREE_TIME * 2
         scene.enemyGroup.add(ghost);
         super( position, ghost )
         this.initialPosition = position

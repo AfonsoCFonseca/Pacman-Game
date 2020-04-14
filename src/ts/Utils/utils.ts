@@ -11,8 +11,10 @@ export class Utils {
     );
 
     if ( neighborTile.type === tileType.TELEPORT  ) {
-      let {x,y} = this.convertTilePosToXY( neighborTile.opositeTeleportPosition)
-      elem.changeCurrentPosition({x,y})
+
+      if( elem.player ) 
+        elem.changeCurrentPosition(this.convertTilePosToXY( neighborTile.opositeTeleportPosition, "pacman"))
+      else elem.changeCurrentPosition(this.convertTilePosToXY( neighborTile.opositeTeleportPosition))
       return elem.actualDirection
     }
     
@@ -33,7 +35,9 @@ export class Utils {
         (elem.actualDirection == "WEST" &&
           (x - i) % 25 === 0 &&
           (x - i) % 2 !== 0) ||
-        (elem.actualDirection == "EAST" && (x + i) % 25 === 0 && (x + i) % 2 !== 0)
+        (elem.actualDirection == "EAST" && 
+          (x + i) % 25 === 0 && 
+          (x + i) % 2 !== 0)
       )
         return elem.requestedDirection;
     }
@@ -108,13 +112,6 @@ export class Utils {
     } else if (nextWay == "lat") {
       dir = rand % 2 == 0 ? directionEnum.EAST : directionEnum.WEST;
     }
-
-    // if( map.getNeighborTile(currentTile, dir ).type == "WALL" ){
-    //     Utils.targetDrawer( map.getNeighborTile(currentTile, dir ) )
-    //     dir = Utils.opositeDirection( dir )
-    //     console.log("aqui")
-    // }
-
     return dir;
   }
 
@@ -151,11 +148,17 @@ export class Utils {
   }
 
   public static calculateSpeed(): number {
-    return SPEED * level;
+    if( level == 1 ) return SPEED
+    else{
+      return SPEED + (level - 1)
+    } 
   }
 
-  public static convertTilePosToXY({x,y}){
-    return {x: (x*50), y: (y*50)}
+  public static convertTilePosToXY({x,y}, pacman = null ){
+    if( pacman ){
+      return {x: ((x*50)+25) , y: (y*50) +25}
+    }  
+    return {x: (x*50) , y: (y*50)}
   }
 
 

@@ -11,6 +11,7 @@ export class Fruit extends Phaser.GameObjects.Sprite {
     let index = indexForRandomFruit();
     super(scene, x, y, "fruits", index);
     this.setOrigin(0, 0);
+    this.setDepth(1.1)
 
     this.setPoints( this.lookAtArray(index) )
     scene.add.existing(this);
