@@ -55,7 +55,7 @@ This choice is made depending on where the x and y of the destined Tile is and i
 # Scratches & Evolution
 
 <p float="left">
-  <img width="460" height="300"  src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/IMG_5625.jpg' >
+  <img width="460" height="300"  src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/IMG_5620.jpg' >
   <img width="186" height="260" src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
   <img width="186" height="260" src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
   <img width="186" height="260" src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/11-04.png' >  
