@@ -1,6 +1,10 @@
 # Pacman-Game
 Classic Pacman game developed from scratch with my logic and structure, written with Phaser and Typescript.
 
+<p align="center">
+  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/separator1.png'>
+</p>
+
 ---------------------------------------------------------------
 # Structure
 Created 3 main Classes:
@@ -50,7 +54,8 @@ This choice is made depending on where the x and y of the destined Tile is and i
 # Scratches & Evolution
 
 <p float="left">
-  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
-  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
-  <img src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/11-04.png' >
+  <img width="460" height="300"  src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/IMG_5625.jpg' >
+  <img width="186" height="260" src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/02-04.png'>
+  <img width="186" height="260" src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/04-04 - Copy.png'>
+  <img width="186" height="260" src='https://github.com/AfonsoCFonseca/Pacman-Game/blob/master/screenshots/11-04.png' >  
 </p>
