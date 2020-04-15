@@ -201,11 +201,8 @@ export class GameScene extends Phaser.Scene {
     pointOb.setTileValue(2);
     this.dots++;
     point.disableBody(true, true);
-    console.log( this.maxDots)
-    console.log( this.dots)
 
     if (this.dots >= this.maxDots) {
-      console.log("next")
       this.nextLevel();
     }
   }

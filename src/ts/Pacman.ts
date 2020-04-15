@@ -49,6 +49,8 @@ export class Pacman {
     }
 
     public setRequestedDirection( reqDir : directionEnum ){
+        if( this.getCurrentTile().type == "TELEPORT") return
+        
         let getNeighborTile = map.getNeighborTile(this.getCurrentTile(), reqDir)
         if( getNeighborTile.type == "WALL" || getNeighborTile.type == "DOOR")
             return
@@ -57,7 +59,11 @@ export class Pacman {
     }
 
     public setNextTile( ) {
-        this.nextTile = map.getNeighborTile( this.getCurrentTile(), this.requestedDirection)
+        if( this.getCurrentTile().type == "TELEPORT"){
+            this.actualDirection = this.getCurrentTile().opositeTeleportPosition.x == 0 ? directionEnum.WEST : directionEnum.EAST
+            this.nextTile = map.getTile( this.getCurrentTile().opositeTeleportPosition )
+        }
+        else this.nextTile = map.getNeighborTile( this.getCurrentTile(), this.requestedDirection)
     }
 
     private setCurrentPosition({ x, y }: Position){

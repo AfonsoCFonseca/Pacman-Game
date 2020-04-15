@@ -50,13 +50,10 @@ export class Map {
         break;
     }
 
-    return this.currentMap[y][x];
+    return this.currentMap[y][x] || null
   }
 
-  public getTile(
-    { x, y }: Position,
-    type: "index" | "position" = "position"
-  ): Tile {
+  public getTile( { x, y }: Position, type: "index" | "position" = "position"): Tile {
     let currentX = type == "position" ? Math.floor(x / this.TILE_SIZE) : x;
     let currentY = type == "position" ? Math.floor(y / this.TILE_SIZE) : y;
     return this.currentMap[currentY][currentX];

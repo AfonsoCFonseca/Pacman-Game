@@ -10,6 +10,7 @@ export class Utils {
       elem.requestedDirection
     );
 
+
     if ( neighborTile.type === tileType.TELEPORT  ) {
 
       if( elem.player ) 
@@ -22,7 +23,7 @@ export class Utils {
       neighborTile.type === tileType.WALL ||
       (neighborTile.type === tileType.DOOR && elem.requestedDirection != "NORTH")
     ) return elem.actualDirection;
-    
+
 
     for (var i = 0; i < SPEED; i++) {
       if (

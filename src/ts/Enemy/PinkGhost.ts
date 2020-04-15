@@ -51,6 +51,9 @@ export class PinkGhost extends Enemy {
             do{
                 let randDir = Utils.getRandomDir()
                 nextTile = map.getNeighborTile(previousTile,randDir)
+                //in case pacman enters the teleport
+                if( nextTile == null ) nextTile =  map.getRandomAvailableTile("ANYWHERE")
+
             }while( nextTile.type != tileType.EMPTY && nextTile.type != tileType.POINT )
             previousTile = nextTile
         }

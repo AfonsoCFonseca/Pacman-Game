@@ -79,7 +79,8 @@ export abstract class Enemy {
       if (mode == GameMode.CHASE) {
         this.SPEED = Utils.calculateSpeed();
       } else if (mode == GameMode.FRIGHTENED) {
-        this.SPEED = this.SPEED / 2;
+        this.SPEED = Math.round( this.SPEED / 2); 
+        console.log( this.SPEED )
       }
       this.mode = mode;
     }
@@ -106,6 +107,7 @@ export abstract class Enemy {
 
   private move() {
     let animationName: string;
+
     switch (this.actualDirection) {
       case "SOUTH":
         animationName = "South";
@@ -130,10 +132,7 @@ export abstract class Enemy {
   }
 
   private findRoute(): directionEnum {
-    if (
-      this.mode == GameMode.FRIGHTENED &&
-      this.getCurrentTile() == this.frightenedTile
-    ) {
+    if ( this.mode == GameMode.FRIGHTENED && this.getCurrentTile() == this.frightenedTile) {
       this.frightenedTile = map.getRandomAvailableTile("ANYWHERE");
       return;
     }
@@ -143,10 +142,7 @@ export abstract class Enemy {
     let chosenDirections = this.makePriority(position, destinyTilePosition);
 
     for (var i = 0; i < chosenDirections.length; i++) {
-      let futureTile = map.getNeighborTile(
-        this.getCurrentTile(),
-        chosenDirections[i]
-      );
+      let futureTile = map.getNeighborTile( this.getCurrentTile(), chosenDirections[i] );
 
       if (
         futureTile.type !== tileType.WALL &&
@@ -167,10 +163,7 @@ export abstract class Enemy {
     return this.requestedDirection;
   }
 
-  private makePriority(
-    { x, y }: Position,
-    destinyTilePosition: Position
-  ): directionEnum[] {
+  private makePriority({ x, y }: Position, destinyTilePosition: Position): directionEnum[] {
     let chosenDirections: directionEnum[] = [];
     let xDistance = x - Math.abs(destinyTilePosition.x);
     let yDistance = y - Math.abs(destinyTilePosition.y);
