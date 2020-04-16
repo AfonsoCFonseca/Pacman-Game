@@ -77,4 +77,13 @@ export class Map {
 
     return destinyTile;
   }
+
+  public destroy(){
+    for (let y = 0; y < this.MAP_TILE_HEIGHT; y++) {
+      for (let x = 0; x < this.MAP_TILE_WIDTH; x++) {
+        if( this.currentMap[y][x].image )
+          this.currentMap[y][x].image.destroy()
+      }
+    }
+  }
 }

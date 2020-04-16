@@ -1,7 +1,7 @@
 import { Position } from "../game-interfaces/position.interface";
 import { GameMode } from "../game-interfaces/modes.interface";
 import { Tile, tileType } from "../Tile";
-import { map } from "../app";
+import { map, redGhost } from "../app";
 import { directionEnum } from "../game-interfaces/direction.interface";
 import { Utils } from "../Utils/utils";
 import {
@@ -9,8 +9,11 @@ import {
   ENEMY_SPAWN_TIME,
   CENTER_MAP_POSITION,
   ENEMY_SETFREE_TIME,
+  SCATTER_TIMER,
+  SCATTER_DURATION 
 } from "../app";
 import { tweenMovement } from "../Utils/animations";
+import { Game } from "phaser";
 
 export abstract class Enemy {
   public SPEED = 3;
@@ -34,7 +37,7 @@ export abstract class Enemy {
     this.timeToSetFree = ghost.timeToSetFree;
     this.ghost.anims.play(`ghost${this.ghostType}East`);
     this.ghost.setDepth(1);
-
+    this.scatterCount()
 
     this.update = this.update.bind(this);
     this.setGameMode = this.setGameMode.bind(this);
@@ -56,6 +59,7 @@ export abstract class Enemy {
 
   public setEnemyFree(): void {
     this.isFree = true;
+    this.setGameMode( GameMode.CHASE)
   }
 
   protected setPosition({ x, y }: Position): void {
@@ -75,15 +79,16 @@ export abstract class Enemy {
   }
 
   protected setGameMode(mode: GameMode): void {
+
     if (this.isFree) {
       if (mode == GameMode.CHASE) {
         this.SPEED = Utils.calculateSpeed();
       } else if (mode == GameMode.FRIGHTENED) {
         this.SPEED = Math.round( this.SPEED / 2); 
-        console.log( this.SPEED )
       }
       this.mode = mode;
     }
+    
   }
 
   public update() {
@@ -105,9 +110,30 @@ export abstract class Enemy {
     this.isFree = false
   }
 
+  private scatterCount(){
+    let self = this 
+    setTimeout(()=>{
+        if( this.mode == GameMode.CHASE ){
+          self.setGameMode(GameMode.SCATTER)
+
+          setTimeout(()=>{
+            console.log( "....", this.mode )
+            if( self.mode == GameMode.SCATTER ){
+              self.setGameMode(GameMode.CHASE)
+            }
+            self.scatterCount()
+          }, SCATTER_DURATION)
+
+        }
+      }, SCATTER_TIMER)
+
+  }
+
   private move() {
     let animationName: string;
-
+    if( this.ghost.type == "red" ) {
+      console.log( this.mode )
+    }
     switch (this.actualDirection) {
       case "SOUTH":
         animationName = "South";
@@ -125,6 +151,7 @@ export abstract class Enemy {
         animationName = "East";
         this.ghost.x += this.SPEED;
     }
+    console.log ( this.mode)
     if (this.mode == GameMode.FRIGHTENED) animationName = "frigthenedAnim";
     else animationName = `ghost${this.ghostType}${animationName}`;
 

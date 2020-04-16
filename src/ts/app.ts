@@ -32,6 +32,8 @@ export const SPEED = 3;
 export let points = 0;
 export const FRIGHTENED_TIME = 7000;
 let frigthenedTimer = null;
+export let SCATTER_TIMER = 12000
+export let SCATTER_DURATION = 6000
 
 let btnRetry
 let backgroundMenu 
@@ -84,7 +86,10 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 50,
       frameHeight: 50,
     });
-    this.load.image("tileImage", "assets/secondTile.png");
+    this.load.image("tileImage1", "assets/firstTile.png");
+    this.load.image("tileImage2", "assets/secondTile.png");
+    this.load.image("tileImage3", "assets/thirdTile.png");
+    this.load.image("tileImage4", "assets/forthTile.png");
     this.load.image("pointImage", "assets/point.png");
     this.load.image("power-up", "assets/power-up.png");
     this.load.image("logo", "assets/Pac-Man_title.png");
@@ -273,6 +278,7 @@ export class GameScene extends Phaser.Scene {
     points = 0
     this.maxDots = 0
     this.dots = 0
+    map.destroy()
     map = new Map()
     //PLAYER RESET
     pacman.prepareForNextLevel()

@@ -4,6 +4,7 @@ import { Fruit } from './Fruit'
 import { Utils } from './Utils/utils'
 
 export let fruit: Fruit
+let makeRandomTileNumber = Math.floor(Math.random() * 4) + 1
 
 export enum tileType {
     EMPTY = "EMPTY",
@@ -26,6 +27,7 @@ export class Tile {
     public _id: string;
     public fruit: Fruit | null
     public opositeTeleportPosition: Position | null
+    public image;
 
 
     constructor( x, y, value ){
@@ -51,21 +53,21 @@ export class Tile {
         if( value == 0 ){
             this.type  = tileType.POINT
             
-            let point = scene.pointsGroup.create( 
+            this.image = scene.pointsGroup.create( 
                 (this.position.x *this.TILE_SIZE) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ),
                 (this.position.y* this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POINT_SIZE/2 ),
                 'pointImage').setOrigin(0,0)
             
-            point.setData('TileObject', this);
+            this.image.setData('TileObject', this);
 
         }
         else if( value == 1 ){
             this.type  = tileType.WALL
-            let square = scene.add.image( 
+            this.image = scene.add.image( 
                 this.position.x * this.TILE_SIZE,
                 this.position.y * this.TILE_SIZE,
-                  "tileImage" ).setOrigin(0,0)
-            scene.imageGroup.add(square);
+                  "tileImage"+makeRandomTileNumber ).setOrigin(0,0)
+            scene.imageGroup.add(this.image);
         }
         else if( value == 2 ){
             this.type  = tileType.EMPTY
@@ -73,21 +75,21 @@ export class Tile {
         else if( value == 3 ){
             this.type = tileType.POWER_UP
 
-            let powerup = scene.powerUpGroup.create( 
+            this.image = scene.powerUpGroup.create( 
                 (this.position.x *this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POWER_UP_SIZE/2 ),
                 (this.position.y* this.TILE_SIZE ) + (this.TILE_SIZE/2 - this.POWER_UP_SIZE/2 ),
                 'power-up').setOrigin(0,0)
             
-                powerup.setData('TileObject', this);
+                this.image.setData('TileObject', this);
         }
         else if( value == 4 ){
             this.type = tileType.DOOR
 
-            let door = scene.add.image( 
+            this.image = scene.add.image( 
                 this.position.x * this.TILE_SIZE,
                 this.position.y * this.TILE_SIZE,
                   "door" ).setOrigin(0,0)
-            scene.imageGroup.add(door);
+            scene.imageGroup.add(this.image);
         }
         else if( value == 5 ){ 
             if( this.value == 1 ) scene.dots++

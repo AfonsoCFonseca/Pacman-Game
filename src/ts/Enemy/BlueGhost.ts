@@ -1,12 +1,11 @@
-import { Position } from '../game-interfaces/position.interface'
 import { Enemy } from './Enemy'
-import { Tile, tileType } from '../Tile';
+import { Tile } from '../Tile';
 import { map, pacman } from '../app'
 import { GameMode } from '../game-interfaces/modes.interface';
-import { scene, redGhost, ENEMY_SETFREE_TIME } from '../app'
-import { directionEnum } from '../game-interfaces/direction.interface';
+import { scene, ENEMY_SETFREE_TIME } from '../app'
 
 export class BlueGhost extends Enemy {
+    private scatterPosition
 
     constructor( ){
         let position = {x: 525, y: 475 }
@@ -17,6 +16,7 @@ export class BlueGhost extends Enemy {
         scene.enemyGroup.add(ghost);
         super( position, ghost )
         this.initialPosition = position
+        this.scatterPosition = {x:2,y:18}
         
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )
@@ -39,7 +39,7 @@ export class BlueGhost extends Enemy {
             case GameMode.FRIGHTENED:
                 return this.frightenedTile
             case GameMode.SCATTER:
-                return map.getTile( pacman.getCurrentPosition() )
+                return map.getTile( this.scatterPosition, 'index' )
         }
 
     }
@@ -76,9 +76,4 @@ export class BlueGhost extends Enemy {
         return map.getTile({x,y}, "position")
     }
 
-    private scatter(){
-        console.log( "scatter" )
-    }
-
-    
 }

@@ -7,15 +7,17 @@ import { scene,ENEMY_SETFREE_TIME } from '../app'
 import { Utils } from '../Utils/utils'
 
 export class PinkGhost extends Enemy {
+    private scatterPosition
 
     constructor( ){
         let position = {x: 475, y: 475 }
         let ghost = scene.physics.add.sprite( position.x, position.y,"ghosts" )
         ghost.type = "Pink"
-        ghost.timeToSetFree = ENEMY_SETFREE_TIME * 3
+        ghost.timeToSetFree = ENEMY_SETFREE_TIME * 4
         scene.enemyGroup.add(ghost);
         super( position, ghost )
         this.initialPosition = position
+        this.scatterPosition = {x:16,y:2}
 
         let newTile = this.findDestinyTile()
         this.setDestinyTile( newTile )
@@ -37,7 +39,7 @@ export class PinkGhost extends Enemy {
             case GameMode.FRIGHTENED:
                 return this.frightenedTile
             case GameMode.SCATTER:
-                return map.getTile( pacman.getCurrentPosition() )
+                return map.getTile( this.scatterPosition, 'index' )
         }
     }
 
@@ -60,10 +62,5 @@ export class PinkGhost extends Enemy {
 
         return nextTile
     }
-
-    private scatter(){
-        console.log( "scatter" )
-    }
-
     
 }
