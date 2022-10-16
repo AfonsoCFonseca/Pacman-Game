@@ -112,8 +112,11 @@ export class GameScene extends Phaser.Scene {
   //************************************ CREATE  ************************************/
   create() {
     player = this.physics.add.sprite(325, 575, "pacman")
-    pointGUI = this.add.text(80, 1200, "Points: 0", {fontSize: "30px",fill: "#FFFFFF",});
-    levelGUI = this.add.text(80, 1160, "Level: 1", {fontSize: "30px",fill: "#FFFFFF",});
+    pointGUI = this.add.text(80, 1200, "Points: 0", {font: "30px",color: "#FFFFFF"});
+    levelGUI = this.add.text(80, 1160, "Level: 1", {font: "30px",color: "#FFFFFF"});
+    
+
+    // gameScene.add.text( { font: "65px Arial", align: "center" }).setDepth(2).setOrigin(0.5, 0);
     
     cursors = this.input.keyboard.createCursorKeys();
 
