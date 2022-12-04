@@ -11,9 +11,7 @@
   "author": "Afonso C Fonseca",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
+    "express": "^4.17.1",
     "live": "^0.1.25-beta.0",
     "phaser": "^3.22.0",
     "ts-loader": "^6.2.2",
