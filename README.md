@@ -15,7 +15,8 @@ node index
 ```
 then access on your browser to: localhost:8080
 
-To access a live version running on a server ( the server may take a couple of minutes to boot, before starting the game )
+To access a live version running on a server ( the server may take a few seconds to boot, before starting the game )
+
 -> https://pacman1991.onrender.com <-
 ( also, it's a slow server )
 
